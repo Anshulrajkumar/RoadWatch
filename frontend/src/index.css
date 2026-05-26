@@ -1,0 +1,74 @@
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Source+Sans+3:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --surface: #fdf8f8;
+  --ink: #1c1b1b;
+  --muted: #f5f3f0;
+  --border: #e8e4df;
+  --navy: #0f2348;
+  --navy-deep: #0b1a37;
+  --accent: #e2871f;
+  --accent-soft: #f3b45c;
+  --map: #f1f0ee;
+  --map-line: #d7d3cf;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Source Sans 3", system-ui, sans-serif;
+  background: var(--surface);
+  color: var(--ink);
+}
+
+.small-caps {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.rw-background {
+  background-image:
+    radial-gradient(circle at 15% 15%, rgba(226, 135, 31, 0.12), transparent 35%),
+    radial-gradient(circle at 85% 10%, rgba(15, 35, 72, 0.12), transparent 40%),
+    linear-gradient(0deg, rgba(232, 228, 223, 0.4) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(232, 228, 223, 0.4) 1px, transparent 1px);
+  background-size: auto, auto, 120px 120px, 120px 120px;
+}
+
+.leaflet-container {
+  height: 100%;
+  width: 100%;
+  background: var(--map);
+  font-family: "Source Sans 3", system-ui, sans-serif;
+}
+
+.rw-map-tint {
+  filter: grayscale(1) contrast(0.92) brightness(0.98);
+}
+
+.rw-marker {
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background: #0f172a;
+  border: 2px solid #ffffff;
+  box-shadow: 0 0 0 6px rgba(15, 23, 42, 0.12);
+}
+
+.rw-divider {
+  height: 1px;
+  background: var(--border);
+}
+
+.rw-app div {
+  border-radius: 0 !important;
+}
