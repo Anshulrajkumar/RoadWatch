@@ -6,10 +6,12 @@ const roadTypes = [
   { code: "MDR", label: "Major District Road (MDR)", color: "bg-[#3a9b5c]" },
 ];
 
-const Sidebar = ({ onUseLocation, onSubmitCoords, loading, coords, error }) => {
+const Sidebar = ({ onUseLocation, onSubmitRoadName, onSubmitCoords, loading, coords, error }) => {
   const [draftLat, setDraftLat] = useState("");
   const [draftLng, setDraftLng] = useState("");
+  const [draftRoadName, setDraftRoadName] = useState("");
   const [draftError, setDraftError] = useState(null);
+  const [searchError, setSearchError] = useState(null);
 
   useEffect(() => {
     if (coords) {
@@ -29,6 +31,17 @@ const Sidebar = ({ onUseLocation, onSubmitCoords, loading, coords, error }) => {
 
     setDraftError(null);
     onSubmitCoords(lat, lng);
+  };
+
+  const handleRoadSearch = () => {
+    const roadName = draftRoadName.trim();
+    if (roadName.length < 2) {
+      setSearchError("Enter at least 2 characters for road name.");
+      return;
+    }
+
+    setSearchError(null);
+    onSubmitRoadName(roadName);
   };
 
   return (
@@ -56,6 +69,31 @@ const Sidebar = ({ onUseLocation, onSubmitCoords, loading, coords, error }) => {
           Coordinates will appear here after location fetch.
         </div>
       )}
+
+      <div className="space-y-3">
+        <p className="small-caps text-ink/60">Search by Road Name</p>
+        <div className="grid gap-3 text-xs text-ink/70">
+          <label className="uppercase tracking-[0.12em]">Road Name</label>
+          <input
+            className="w-full border border-border bg-white px-3 py-2 text-sm text-ink outline-none"
+            value={draftRoadName}
+            onChange={(event) => setDraftRoadName(event.target.value)}
+            placeholder="Enter road name (for example NH44)"
+          />
+          <button
+            className="w-full border border-navy px-4 py-3 text-sm font-semibold uppercase tracking-[0.1em] text-navy transition hover:border-accent hover:text-accent"
+            onClick={handleRoadSearch}
+            disabled={loading}
+          >
+            {loading ? "Searching..." : "Search by Name"}
+          </button>
+          {searchError ? (
+            <div className="border border-red-200 bg-red-50 px-3 py-2 text-[11px] text-red-700">
+              {searchError}
+            </div>
+          ) : null}
+        </div>
+      </div>
 
       <div className="space-y-3">
         <p className="small-caps text-ink/60">Manual Coordinates</p>
