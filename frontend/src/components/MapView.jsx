@@ -39,21 +39,6 @@ const MapView = ({ center, userCoords, targetCoords, loading, roadData }) => {
 
   return (
     <section className="relative overflow-hidden rounded-xl border border-border bg-white shadow-card">
-      <div className="absolute left-6 bottom-6 z-[500] rounded-lg bg-navy px-5 py-3 text-xs text-white shadow-soft">
-        <p className="small-caps text-white/70">Map Legend</p>
-        <div className="mt-3 flex items-center gap-4 text-[11px]">
-          <span className="flex items-center gap-2">
-            <span className="h-2 w-2 rounded-full bg-white" /> Completed
-          </span>
-          <span className="flex items-center gap-2">
-            <span className="h-2 w-2 rounded-full bg-accent" /> In Progress
-          </span>
-          <span className="flex items-center gap-2">
-            <span className="h-2 w-2 rounded-full bg-white/40" /> Scheduled
-          </span>
-        </div>
-      </div>
-
       <div className="absolute right-6 top-6 z-[500] rounded-full bg-white/80 px-4 py-2 text-xs text-ink/70 shadow-card">
         {loading ? "Fetching road intelligence..." : roadData?.road?.roadCode || "Live road intelligence"}
       </div>
