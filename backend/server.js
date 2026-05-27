@@ -9,6 +9,8 @@ const morgan = require("morgan");
 
 const { getConfig } = require("./config");
 const roadRoutes = require("./routes/roadRoutes");
+const issueRoutes = require("./routes/issueRoutes");
+const complaintRoutes = require("./routes/complaintRoutes");
 const rateLimiter = require("./middleware/rateLimiter");
 const { notFoundHandler, errorHandler } = require("./middleware/errorHandler");
 
@@ -24,12 +26,15 @@ app.use(
 app.use(express.json({ limit: "1mb" }));
 app.use(morgan("combined"));
 app.use(rateLimiter);
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 app.get("/health", (req, res) => {
   res.json({ status: "ok", service: "RoadWatch backend" });
 });
 
 app.use("/api/road", roadRoutes);
+app.use("/api/issues", issueRoutes);
+app.use("/api/complaints", complaintRoutes);
 
 app.use(notFoundHandler);
 app.use(errorHandler);

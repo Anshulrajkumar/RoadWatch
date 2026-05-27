@@ -1,0 +1,31 @@
+{
+  "complaints": [
+    {
+      "id": 1,
+      "complaintId": "RW-RD-BAG-2026-001",
+      "roadCode": null,
+      "roadName": "Sālānpur",
+      "roadType": "Unknown",
+      "authority": "Unknown",
+      "district": "Baghmara-Cum-Katras",
+      "state": "Jharkhand",
+      "lat": 23.816751,
+      "lng": 86.290984,
+      "issueType": "Pothole",
+      "description": "Complaint of a large pothole on the road, causing potential damage to vehicles. Location is unspecified. Request for prompt repair is made.",
+      "severity": "Medium",
+      "priority": "Priority",
+      "riskScore": 70,
+      "mediaUrl": "http://localhost:4000/uploads/issues/1779885630425-e95003847a97.jpg",
+      "media": {
+        "imageUrl": "http://localhost:4000/uploads/issues/1779885630425-e95003847a97.jpg",
+        "videoUrl": null
+      },
+      "status": "Submitted",
+      "createdAt": "2026-05-27T12:40:30.670Z"
+    }
+  ],
+  "counters": {
+    "RD-BAG-2026": 1
+  }
+}
