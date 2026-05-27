@@ -15,4 +15,16 @@ export const getNearestRoad = async (lat, lng) => {
   return response.data;
 };
 
+export const getRoadByName = async (roadName, lat, lng) => {
+  const params = { roadName };
+
+  if (Number.isFinite(lat) && Number.isFinite(lng)) {
+    params.lat = lat;
+    params.lng = lng;
+  }
+
+  const response = await api.get("/api/road/search", { params });
+  return response.data;
+};
+
 export default api;
