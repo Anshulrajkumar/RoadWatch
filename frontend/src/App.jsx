@@ -4,7 +4,7 @@ import Dashboard from "./pages/Dashboard.jsx";
 import ReportIssue from "./pages/ReportIssue.jsx";
 import ComplaintHistoryPage from "./pages/ComplaintHistoryPage.jsx";
 import LandingPage from "./pages/LandingPage.jsx";
-import LoginPage from "./pages/LoginPage.jsx";
+
 
 const App = () => {
   const getLocation = () => ({
@@ -41,9 +41,7 @@ const App = () => {
   const activePage = (() => {
     const { pathname, hash } = location;
 
-    if (pathname === "/login") {
-      return null;
-    }
+
 
     if (pathname === "/map" || pathname === "/dashboard") {
       return pathname === "/map" ? "search" : "dashboard";
@@ -72,17 +70,7 @@ const App = () => {
     return "home";
   })();
 
-  // --- Login Page (standalone, no dashboard layout) ---
-  if (location.pathname === "/login") {
-    return (
-      <LoginPage
-        activePage={activePage}
-        onBack={() => navigate("/")}
-        onNavigate={navigate}
-        onBrandClick={() => navigate("/")}
-      />
-    );
-  }
+
 
   // --- Dashboard pages (map search / road tracking) ---
   if (location.pathname === "/map") {
@@ -116,7 +104,7 @@ const App = () => {
     <LandingPage
       activePage={activePage}
       locationHash={location.hash}
-      onLogin={() => navigate("/login")}
+
       onMap={() => navigate("/map")}
       onReport={() => navigate("/report")}
       onNavigate={navigate}

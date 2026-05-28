@@ -24,6 +24,14 @@ const config = {
     retry: 1,
     retryDelayMs: 800,
   },
+  gemini: {
+    apiKey: process.env.GEMINI_API_KEY || "",
+    model: "gemini-2.0-flash",
+    baseUrl: "https://generativelanguage.googleapis.com/v1beta",
+    timeoutMs: 20000,
+    retry: 1,
+    retryDelayMs: 1000,
+  },
   cache: {
     ttlMs: 300000,
     maxEntries: 1000,

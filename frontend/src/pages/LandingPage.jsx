@@ -1,6 +1,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import Header from "../components/Header.jsx";
+import heroBg from "../assets/bg.jpg";
 
 const capabilities = [
   {
@@ -43,10 +44,7 @@ const capabilities = [
 
 const HeroBackdrop = () => (
   <div className="pointer-events-none absolute inset-0 overflow-hidden">
-    <div className="absolute inset-0 bg-navy" />
-    <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.03),rgba(255,255,255,0)_24%),linear-gradient(180deg,rgba(0,0,0,0.04),rgba(0,0,0,0.24))]" />
-    <div className="absolute inset-0 opacity-20 [background-image:linear-gradient(rgba(255,255,255,0.07)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.07)_1px,transparent_1px)] [background-size:140px_140px]" />
-    <div className="absolute inset-x-0 bottom-0 h-[44%] bg-[linear-gradient(180deg,transparent,rgba(11,26,55,0.88))]" />
+    <div className="absolute inset-0 bg-black/40" />
   </div>
 );
 
@@ -68,22 +66,22 @@ const featureShowcase = [
     cta: "Explore Map",
     onAction: "map",
     visual: (
-      <div className="rounded-[1.5rem] border border-border bg-white p-5 shadow-[0_18px_40px_rgba(12,22,40,0.08)]">
-        <div className="flex items-center justify-between text-xs uppercase tracking-[0.18em] text-ink/60">
+      <div className="rounded-[1.5rem] border-2 border-white/30 bg-white p-5 shadow-[0_18px_40px_rgba(0,0,0,0.25)]">
+        <div className="flex items-center justify-between text-xs uppercase tracking-[0.18em] text-ink">
           <span>Live map preview</span>
           <span>Transparency</span>
         </div>
-        <div className="mt-4 h-56 rounded-[1.25rem] border border-border bg-[#eef2f8]">
+        <div className="mt-4 h-56 rounded-[1.25rem] border border-gray-300 bg-[#eef2f8]">
           <div className="relative h-full overflow-hidden rounded-[1.25rem]">
             <div className="absolute inset-0 opacity-60 [background-image:linear-gradient(rgba(0,0,0,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(0,0,0,0.06)_1px,transparent_1px)] [background-size:60px_60px]" />
             <div className="absolute left-[20%] top-[62%] h-4 w-4 rounded-full border-4 border-white bg-[#111827] shadow-[0_0_0_2px_rgba(17,24,39,0.12)]" />
             <div className="absolute right-[18%] top-[28%] h-4 w-4 rounded-sm border-4 border-white bg-[#ef4444] shadow-[0_0_0_2px_rgba(239,68,68,0.14)]" />
-            <div className="absolute left-4 top-4 rounded-full bg-white/90 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-ink/60">
+            <div className="absolute left-4 top-4 rounded-full bg-white px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-ink">
               Road search
             </div>
           </div>
         </div>
-        <div className="mt-5 grid gap-3 text-sm text-ink/70 sm:grid-cols-2">
+        <div className="mt-5 grid gap-3 text-sm text-ink font-medium sm:grid-cols-2">
           {[
             "Contractor name",
             "Responsible authority",
@@ -92,7 +90,7 @@ const featureShowcase = [
             "Maintenance history",
             "Road condition",
           ].map((item) => (
-            <div key={item} className="rounded-lg border border-border bg-white px-3 py-2">
+            <div key={item} className="rounded-lg border border-gray-300 bg-[#f6f7fb] px-3 py-2">
               {item}
             </div>
           ))}
@@ -108,23 +106,23 @@ const featureShowcase = [
     cta: "Report Issue",
     onAction: "complaint",
     visual: (
-      <div className="rounded-[1.5rem] border border-border bg-white p-5 shadow-[0_18px_40px_rgba(12,22,40,0.08)]">
-        <div className="flex items-center justify-between text-xs uppercase tracking-[0.18em] text-ink/60">
+      <div className="rounded-[1.5rem] border-2 border-white/30 bg-white p-5 shadow-[0_18px_40px_rgba(0,0,0,0.25)]">
+        <div className="flex items-center justify-between text-xs uppercase tracking-[0.18em] text-ink">
           <span>Report flow</span>
           <span>Citizen first</span>
         </div>
         <div className="mt-4 grid gap-3 sm:grid-cols-2">
           {["Pothole", "Street Light", "Drainage", "Signage"].map((label) => (
-            <div key={label} className="rounded-xl border border-border bg-[#f6f7fb] px-4 py-6 text-center text-sm font-semibold text-ink/70">
+            <div key={label} className="rounded-xl border border-gray-300 bg-[#f6f7fb] px-4 py-6 text-center text-sm font-semibold text-ink">
               {label}
             </div>
           ))}
         </div>
-        <div className="mt-4 rounded-xl border border-border bg-white px-4 py-4 text-sm text-ink/70">
+        <div className="mt-4 rounded-xl border border-gray-300 bg-[#f6f7fb] px-4 py-4 text-sm text-ink font-medium">
           Upload photo, tag location, and describe the issue in minutes.
         </div>
         <div className="mt-4 flex items-center justify-between gap-3">
-          <div className="rounded-full border border-border px-3 py-2 text-xs uppercase tracking-[0.18em] text-ink/60">GPS Tag</div>
+          <div className="rounded-full border border-gray-300 px-3 py-2 text-xs uppercase tracking-[0.18em] text-ink font-semibold">GPS Tag</div>
           <button className="rounded-xl bg-accent px-4 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-white">
             Submit
           </button>
@@ -140,8 +138,8 @@ const featureShowcase = [
     cta: "View Dashboard",
     onAction: "dashboard",
     visual: (
-      <div className="rounded-[1.5rem] border border-border bg-white p-5 shadow-[0_18px_40px_rgba(12,22,40,0.08)]">
-        <div className="flex items-center justify-between text-xs uppercase tracking-[0.18em] text-ink/60">
+      <div className="rounded-[1.5rem] border-2 border-white/30 bg-white p-5 shadow-[0_18px_40px_rgba(0,0,0,0.25)]">
+        <div className="flex items-center justify-between text-xs uppercase tracking-[0.18em] text-ink">
           <span>My complaints</span>
           <span>Status</span>
         </div>
@@ -151,17 +149,17 @@ const featureShowcase = [
             { label: "In Review", value: "7" },
             { label: "Pending", value: "4" },
           ].map((stat) => (
-            <div key={stat.label} className="rounded-xl border border-border bg-[#f6f7fb] px-4 py-4 text-center">
-              <p className="text-xs uppercase tracking-[0.18em] text-ink/50">{stat.label}</p>
+            <div key={stat.label} className="rounded-xl border border-gray-300 bg-[#f6f7fb] px-4 py-4 text-center">
+              <p className="text-xs uppercase tracking-[0.18em] text-ink font-semibold">{stat.label}</p>
               <p className="mt-2 text-2xl font-semibold text-ink">{stat.value}</p>
             </div>
           ))}
         </div>
         <div className="mt-4 space-y-3">
           {["Deep pothole on NH-44", "Damaged divider", "Faded lane markings"].map((item) => (
-            <div key={item} className="flex items-center justify-between rounded-xl border border-border bg-white px-4 py-3 text-sm">
-              <span className="font-semibold text-ink/80">{item}</span>
-              <span className="rounded-full bg-[#e7eef9] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-ink/60">
+            <div key={item} className="flex items-center justify-between rounded-xl border border-gray-300 bg-[#f6f7fb] px-4 py-3 text-sm">
+              <span className="font-semibold text-ink">{item}</span>
+              <span className="rounded-full bg-[#d4dfef] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-ink">
                 In review
               </span>
             </div>
@@ -270,7 +268,7 @@ const previewSlides = [
   },
 ];
 
-const LandingPage = ({ onLogin, onMap, onReport, onNavigate, onBrandClick, activePage, locationHash }) => {
+const LandingPage = ({ onMap, onReport, onNavigate, onBrandClick, activePage, locationHash }) => {
   const [slideIndex, setSlideIndex] = useState(0);
 
   useEffect(() => {
@@ -298,7 +296,10 @@ const LandingPage = ({ onLogin, onMap, onReport, onNavigate, onBrandClick, activ
   };
 
   return (
-    <div className="min-h-screen bg-surface text-ink">
+    <div
+      className="rw-landing-bg relative min-h-screen text-ink"
+      style={{ backgroundImage: `url(${heroBg})` }}
+    >
       <Header activePage={activePage} onNavigate={onNavigate} onBrandClick={onBrandClick} />
 
       <main>
@@ -309,21 +310,19 @@ const LandingPage = ({ onLogin, onMap, onReport, onNavigate, onBrandClick, activ
               initial={{ opacity: 0, y: 24 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-              className="max-w-3xl text-white"
+              className="max-w-3xl text-white rw-text-shadow-sm"
             >
-              <div className="inline-flex rounded-full border border-[#e3c17b]/60 bg-white/5 px-4 py-2 text-[0.68rem] font-semibold uppercase tracking-[0.22em] text-[#e3c17b]">
-                See your road status in one click
-              </div>
 
-              <h1 className="mt-6 max-w-4xl text-5xl font-semibold leading-[0.95] tracking-tight sm:text-6xl lg:text-[5.5rem]">
-                RoadWatch
+
+              <h1 className="rw-text-shadow mt-6 max-w-4xl text-6xl font-semibold leading-[0.95] tracking-tight sm:text-7xl lg:text-[7rem]">
+                Road<span className="text-accent">Watch</span>
               </h1>
 
-              <h2 className="mt-4 max-w-4xl text-3xl font-semibold leading-[1.06] tracking-tight text-white sm:text-4xl lg:text-6xl">
+              <h2 className="rw-text-shadow mt-4 max-w-4xl text-3xl font-semibold leading-[1.06] tracking-tight text-white sm:text-4xl lg:text-6xl">
                 Ensuring Safe and Efficient Road Infrastructure for Every Citizen.
               </h2>
 
-              <p className="mt-6 max-w-2xl text-base leading-8 text-white/78 sm:text-lg">
+              <p className="rw-text-shadow-sm mt-6 max-w-2xl text-base leading-8 text-white sm:text-lg">
                 A centralized platform for real-time tracking, transparent reporting, and citizen-driven accountability
                 in public infrastructure maintenance.
               </p>
@@ -333,23 +332,14 @@ const LandingPage = ({ onLogin, onMap, onReport, onNavigate, onBrandClick, activ
                   type="button"
                   whileHover={{ y: -2, scale: 1.01 }}
                   whileTap={{ scale: 0.98 }}
-                  onClick={() => scrollTo("#capabilities")}
+                  onClick={onMap}
                   className="inline-flex items-center justify-center gap-3 rounded-lg bg-accent px-8 py-4 text-sm font-semibold uppercase tracking-[0.18em] text-[#18202c] transition hover:bg-[#f39a32]"
                 >
                   GET STARTED
                 </motion.button>
-                <motion.button
-                  type="button"
-                  whileHover={{ y: -2 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={onLogin}
-                  className="inline-flex items-center justify-center rounded-lg border border-white/32 bg-transparent px-8 py-4 text-sm font-semibold uppercase tracking-[0.18em] text-white transition hover:border-white/45 hover:bg-white/5"
-                >
-                  LOG IN
-                </motion.button>
               </div>
 
-              <div className="mt-10 grid gap-4 text-sm text-white/70 sm:grid-cols-3">
+              <div className="mt-10 grid gap-4 text-sm text-white sm:grid-cols-3">
                 {[
                   ["Live intelligence", "Infrastructure and issue data in one view"],
                   ["Transparent flow", "Actionable reporting with public accountability"],
@@ -357,7 +347,7 @@ const LandingPage = ({ onLogin, onMap, onReport, onNavigate, onBrandClick, activ
                 ].map(([title, description]) => (
                   <div key={title} className="rounded-2xl border border-white/10 bg-white/5 px-4 py-4">
                     <p className="text-sm font-semibold text-white">{title}</p>
-                    <p className="mt-2 leading-6 text-white/68">{description}</p>
+                    <p className="mt-2 leading-6 text-white/90">{description}</p>
                   </div>
                 ))}
               </div>
@@ -370,10 +360,7 @@ const LandingPage = ({ onLogin, onMap, onReport, onNavigate, onBrandClick, activ
               className="relative"
             >
               <div className="relative overflow-hidden rounded-[1.5rem] border border-white/10 bg-white/5 p-4 sm:p-5">
-                <div className="px-1 pb-4 text-white/70">
-                  <p className="small-caps text-white/55">Page previews</p>
-                  <p className="mt-1 text-sm text-white/68">Browse key screens from the platform</p>
-                </div>
+
 
                 <div className="relative min-h-[520px] overflow-hidden rounded-[1.1rem] border border-white/10 bg-[#0f2348] p-4 sm:p-5">
                   <AnimatePresence mode="wait">
@@ -420,8 +407,9 @@ const LandingPage = ({ onLogin, onMap, onReport, onNavigate, onBrandClick, activ
           </div>
         </section>
 
-        <section id="about" className="relative bg-surface py-20 sm:py-24 lg:py-28">
+        <section id="about" className="relative py-20 sm:py-24 lg:py-28">
           <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="rw-dark-panel">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -429,11 +417,11 @@ const LandingPage = ({ onLogin, onMap, onReport, onNavigate, onBrandClick, activ
               transition={{ duration: 0.55 }}
               className="mx-auto max-w-3xl text-center"
             >
-              <div className="small-caps text-ink/50">Core capabilities</div>
-              <h2 className="mt-4 text-3xl font-semibold tracking-tight text-ink sm:text-4xl lg:text-5xl">
+              <div className="rw-text-shadow-sm small-caps text-white">Core capabilities</div>
+              <h2 className="rw-text-shadow mt-4 text-3xl font-semibold tracking-tight text-white sm:text-4xl lg:text-5xl">
                 Empowering citizens and authorities with actionable intelligence.
               </h2>
-              <p className="mt-5 text-base leading-8 text-ink/68 sm:text-lg">
+              <p className="rw-text-shadow-sm mt-5 text-base leading-8 text-white sm:text-lg">
                 A minimal, modern system for understanding road conditions, resolving issues faster, and keeping public
                 infrastructure visible and accountable.
               </p>
@@ -460,10 +448,10 @@ const LandingPage = ({ onLogin, onMap, onReport, onNavigate, onBrandClick, activ
                     }
                     role={interactive ? "button" : undefined}
                     tabIndex={interactive ? 0 : undefined}
-                    className={`group rounded-[1.25rem] border border-border bg-white p-6 transition duration-200 ${
+                    className={`group rounded-[1.25rem] border border-white/20 bg-black/50 p-6 transition duration-200 ${
                       interactive
-                        ? "cursor-pointer shadow-[0_8px_22px_rgba(15,23,42,0.05)] hover:-translate-y-0.5 hover:border-[#b8c7de] hover:shadow-[0_12px_28px_rgba(15,23,42,0.08)] focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
-                        : "shadow-[0_8px_22px_rgba(15,23,42,0.05)]"
+                        ? "cursor-pointer shadow-[0_8px_22px_rgba(0,0,0,0.2)] hover:-translate-y-0.5 hover:bg-white/15 hover:shadow-[0_12px_28px_rgba(0,0,0,0.25)] focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
+                        : "shadow-[0_8px_22px_rgba(0,0,0,0.2)]"
                     }`}
                   >
                     <div className={`grid h-14 w-14 place-items-center rounded-2xl ${feature.tone}`}>
@@ -471,18 +459,20 @@ const LandingPage = ({ onLogin, onMap, onReport, onNavigate, onBrandClick, activ
                         {feature.icon}
                       </svg>
                     </div>
-                    <h3 className="mt-8 text-2xl font-semibold tracking-tight text-ink">{feature.title}</h3>
-                    <p className="mt-4 max-w-sm text-base leading-8 text-ink/70">{feature.description}</p>
+                    <h3 className="rw-text-shadow mt-8 text-2xl font-semibold tracking-tight text-white">{feature.title}</h3>
+                    <p className="rw-text-shadow-sm mt-4 max-w-sm text-base leading-8 text-white">{feature.description}</p>
                   </motion.article>
                 );
               })}
             </div>
           </div>
+            </div>
         </section>
 
-        <section id="features" className="py-0">
-          <div className="w-full bg-surface">
+        <section id="features" className="relative py-0">
+          <div className="w-full">
             <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 py-20 sm:py-24 lg:py-28">
+              <div className="rw-dark-panel">
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -490,17 +480,18 @@ const LandingPage = ({ onLogin, onMap, onReport, onNavigate, onBrandClick, activ
                 transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
                 className="mx-auto max-w-3xl text-center"
               >
-                <div className="small-caps text-ink/50">Features</div>
-                <h2 className="mt-4 text-4xl font-semibold leading-tight tracking-tight text-ink sm:text-5xl lg:text-6xl">
+                <div className="rw-text-shadow-sm small-caps text-white">Features</div>
+                <h2 className="rw-text-shadow mt-4 text-4xl font-semibold leading-tight tracking-tight text-white sm:text-5xl lg:text-6xl">
                   Product-focused capabilities built for civic infrastructure.
                 </h2>
-                <p className="mt-6 mx-auto max-w-2xl text-base leading-9 text-ink/68 sm:text-lg">
+                <p className="rw-text-shadow-sm mt-6 mx-auto max-w-2xl text-base leading-9 text-white sm:text-lg">
                   Each feature panel highlights how RoadWatch helps citizens and authorities search, report, and track
                   issues with transparency and clarity.
                 </p>
               </motion.div>
+              </div>
             </div>
-            <div className="w-full border-t border-border" />
+            <div className="w-full border-t border-white/15" />
           </div>
 
           <div className="mt-12 space-y-12">
@@ -522,42 +513,30 @@ const LandingPage = ({ onLogin, onMap, onReport, onNavigate, onBrandClick, activ
               return (
                 <section
                   key={feature.id}
-                  className={`min-h-[92vh] py-14 ${
-                    isDark
-                      ? "bg-navy-deep text-white shadow-[0_32px_80px_rgba(11,26,55,0.18)]"
-                      : "bg-surface text-ink"
-                  }`}
+                  className={`relative min-h-[92vh] py-14 text-white`}
                 >
-                  <div className="mx-auto grid w-full max-w-7xl items-center gap-10 px-4 sm:px-6 lg:grid-cols-[0.55fr_0.45fr] lg:gap-16 lg:px-8">
+                  <div className="rw-dark-panel mx-auto grid w-full max-w-7xl items-center gap-10 px-4 sm:px-6 lg:grid-cols-[0.55fr_0.45fr] lg:gap-16 lg:px-8">
                     <div className={`space-y-6 ${isEven ? "order-1" : "order-2"}`}>
-                      <p className={`small-caps ${isDark ? "text-white/60" : "text-ink/50"}`}>
+                      <p className="rw-text-shadow-sm small-caps text-white">
                         Feature {index + 1}
                       </p>
-                      <h3 className={`text-3xl font-semibold tracking-tight sm:text-4xl ${isDark ? "text-white" : "text-ink"}`}>
+                      <h3 className="rw-text-shadow text-3xl font-semibold tracking-tight sm:text-4xl text-white">
                         {feature.title}
                       </h3>
-                      <p className={`text-base leading-8 sm:text-lg ${isDark ? "text-white/72" : "text-ink/68"}`}>
+                      <p className="rw-text-shadow-sm text-base leading-8 sm:text-lg text-white">
                         {feature.description}
                       </p>
                       <div className="flex flex-wrap gap-3">
                         <button
                           type="button"
                           onClick={handleAction}
-                          className={`rounded-xl px-6 py-3 text-sm font-semibold uppercase tracking-[0.16em] transition ${
-                            isDark
-                              ? "bg-white text-navy hover:bg-white/90"
-                              : "bg-navy text-white hover:bg-navy-deep"
-                          }`}
+                          className="rounded-xl px-6 py-3 text-sm font-semibold uppercase tracking-[0.16em] transition bg-accent text-white hover:bg-accent-soft"
                         >
                           {feature.cta}
                         </button>
                         <button
                           type="button"
-                          className={`rounded-xl px-6 py-3 text-sm font-semibold uppercase tracking-[0.16em] ${
-                            isDark
-                              ? "border border-white/30 text-white/75 hover:border-white/50"
-                              : "border border-border text-ink/70"
-                          }`}
+                          className="rounded-xl px-6 py-3 text-sm font-semibold uppercase tracking-[0.16em] border border-white/40 text-white hover:border-white/60 hover:bg-white/10"
                         >
                           Learn more
                         </button>
@@ -585,9 +564,7 @@ const LandingPage = ({ onLogin, onMap, onReport, onNavigate, onBrandClick, activ
             <a href="#top" className="transition hover:text-white">
               Terms of Service
             </a>
-            <button type="button" onClick={onLogin} className="transition hover:text-white">
-              Department Login
-            </button>
+
             <a href="#contact" className="transition hover:text-white">
               Contact Support
             </a>

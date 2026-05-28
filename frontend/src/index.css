@@ -61,6 +61,16 @@ body {
   font-family: "Source Sans 3", system-ui, sans-serif;
 }
 
+/* Keep Leaflet controls below the fixed navbar (z-1000) */
+.leaflet-top,
+.leaflet-bottom {
+  z-index: 400 !important;
+}
+
+.leaflet-control {
+  z-index: 400 !important;
+}
+
 .rw-map-tint .leaflet-tile {
   filter: grayscale(1) contrast(0.92) brightness(0.98);
 }
@@ -90,4 +100,36 @@ body {
 
 .rw-app div {
   border-radius: 0 !important;
+}
+
+/* Landing page background: portrait image fits mobile naturally */
+.rw-landing-bg {
+  background-size: 100% auto;
+  background-position: center top;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
+@media (min-width: 1024px) {
+  .rw-landing-bg {
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: scroll;
+  }
+}
+
+/* Text shadow for readability on vibrant backgrounds */
+.rw-text-shadow {
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7), 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+.rw-text-shadow-sm {
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6), 0 1px 2px rgba(0, 0, 0, 0.4);
+}
+
+/* Dark panel for content readability over background */
+.rw-dark-panel {
+  background: rgba(11, 26, 55, 0.75);
+  border-radius: 1.5rem;
+  padding: 2.5rem 2rem;
 }

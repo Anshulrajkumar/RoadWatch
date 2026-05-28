@@ -2,12 +2,9 @@ import { useState } from "react";
 
 const navItems = [
   { id: "home", label: "Home", href: "/" },
-  { id: "about", label: "About", href: "#about" },
-  { id: "features", label: "Features", href: "#features" },
   { id: "search", label: "Search", href: "/map" },
   { id: "complaint", label: "Complain section", href: "/report" },
   { id: "dashboard", label: "Dashboard", href: "/dashboard" },
-  { id: "contact", label: "Contact", href: "#contact" },
 ];
 
 const Header = ({ activePage, onNavigate, onBrandClick }) => {
@@ -33,10 +30,9 @@ const Header = ({ activePage, onNavigate, onBrandClick }) => {
       <header className="fixed inset-x-0 top-0 z-[1000] border-b border-border bg-navy text-white shadow-[0_6px_18px_rgba(4,10,20,0.14)]">
       <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
         <button type="button" onClick={onBrandClick} className="flex items-center gap-3 text-left text-white">
-          <div className="h-11 w-11 rounded-2xl bg-white/10" />
           <div>
-            <p className="small-caps text-white/70">Government of India</p>
-            <h1 className="text-2xl font-semibold tracking-tight sm:text-[1.7rem]">RoadWatch</h1>
+            <p className="small-caps text-white/70">Road Infrastructure Monitor</p>
+            <h1 className="text-lg font-semibold tracking-tight sm:text-xl">Road<span className="text-accent">Watch</span></h1>
           </div>
         </button>
 
