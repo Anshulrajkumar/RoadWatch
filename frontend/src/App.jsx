@@ -4,6 +4,7 @@ import Dashboard from "./pages/Dashboard.jsx";
 import ReportIssue from "./pages/ReportIssue.jsx";
 import ComplaintHistoryPage from "./pages/ComplaintHistoryPage.jsx";
 import LandingPage from "./pages/LandingPage.jsx";
+import ChatbotWidget from "./components/chatbot/ChatbotWidget.jsx";
 
 
 const App = () => {
@@ -75,48 +76,60 @@ const App = () => {
   // --- Dashboard pages (map search / road tracking) ---
   if (location.pathname === "/map") {
     return (
-      <DashboardLayout activePage={activePage} onNavigate={navigate} onBrandClick={() => navigate("/")}>
-        <Dashboard onNavigate={navigate} />
-      </DashboardLayout>
+      <>
+        <DashboardLayout activePage={activePage} onNavigate={navigate} onBrandClick={() => navigate("/")}>
+          <Dashboard onNavigate={navigate} />
+        </DashboardLayout>
+        <ChatbotWidget currentPage={location.pathname} />
+      </>
     );
   }
 
   // --- Report Issue page ---
   if (location.pathname === "/report") {
     return (
-      <DashboardLayout activePage={activePage} onNavigate={navigate} onBrandClick={() => navigate("/")}>
-        <ReportIssue />
-      </DashboardLayout>
+      <>
+        <DashboardLayout activePage={activePage} onNavigate={navigate} onBrandClick={() => navigate("/")}>
+          <ReportIssue />
+        </DashboardLayout>
+        <ChatbotWidget currentPage={location.pathname} />
+      </>
     );
   }
 
   // --- Complaint History / Tracking page ---
   if (location.pathname === "/complaints" || location.pathname === "/dashboard") {
     return (
-      <DashboardLayout activePage={activePage} onNavigate={navigate} onBrandClick={() => navigate("/")}>
-        <ComplaintHistoryPage />
-      </DashboardLayout>
+      <>
+        <DashboardLayout activePage={activePage} onNavigate={navigate} onBrandClick={() => navigate("/")}>
+          <ComplaintHistoryPage />
+        </DashboardLayout>
+        <ChatbotWidget currentPage={location.pathname} />
+      </>
     );
   }
 
   // --- Landing Page (default route) ---
   return (
-    <LandingPage
-      activePage={activePage}
-      locationHash={location.hash}
+    <>
+      <LandingPage
+        activePage={activePage}
+        locationHash={location.hash}
 
-      onMap={() => navigate("/map")}
-      onReport={() => navigate("/report")}
-      onNavigate={navigate}
-      onBrandClick={() => {
-        if (location.pathname === "/") {
-          window.scrollTo({ top: 0, behavior: "smooth" });
-          return;
-        }
+        onMap={() => navigate("/map")}
+        onReport={() => navigate("/report")}
+        onNavigate={navigate}
+        onBrandClick={() => {
+          if (location.pathname === "/") {
+            window.scrollTo({ top: 0, behavior: "smooth" });
+            return;
+          }
 
-        navigate("/");
-      }}
-    />
+          navigate("/");
+        }}
+      />
+      <ChatbotWidget currentPage={location.pathname} />
+    </>
   );
 };
 

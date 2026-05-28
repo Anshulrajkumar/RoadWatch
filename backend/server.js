@@ -11,6 +11,7 @@ const { getConfig } = require("./config");
 const roadRoutes = require("./routes/roadRoutes");
 const issueRoutes = require("./routes/issueRoutes");
 const complaintRoutes = require("./routes/complaintRoutes");
+const chatbotRoutes = require("./routes/chatbotRoutes");
 const rateLimiter = require("./middleware/rateLimiter");
 const { notFoundHandler, errorHandler } = require("./middleware/errorHandler");
 
@@ -35,6 +36,7 @@ app.get("/health", (req, res) => {
 app.use("/api/road", roadRoutes);
 app.use("/api/issues", issueRoutes);
 app.use("/api/complaints", complaintRoutes);
+app.use("/api/chatbot", chatbotRoutes);
 
 app.use(notFoundHandler);
 app.use(errorHandler);
