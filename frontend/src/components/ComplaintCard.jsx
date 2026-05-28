@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import StatusBadge from "./StatusBadge.jsx";
+import TrackingProgressBar from "./TrackingProgressBar.jsx";
 
 const summarize = (complaint) => {
   const text = complaint.summary || complaint.description || "";
@@ -87,46 +88,10 @@ const ComplaintCard = ({ complaint, active, onSelect }) => {
 
       <p className="mt-3 text-sm text-ink/60">{summarize(complaint)}</p>
 
-      <div className="mt-4 space-y-2">
-        <div className="flex items-center justify-between text-[11px] uppercase tracking-[0.12em] text-ink/50">
-          <span>Tracking Progress</span>
-          <span>{progressPercent}%</span>
-        </div>
-        <div className="relative">
-          <div className="absolute left-0 right-0 top-2 h-1 rounded-full bg-muted" />
-          <div
-            className="absolute left-0 top-2 h-1 rounded-full bg-accent"
-            style={{ width: `${Math.min(100, Math.max(0, progressPercent))}%` }}
-          />
-          <div className="relative grid grid-cols-5">
-            {steps.map((step, index) => {
-              const state = getStepState(step);
-              const tone =
-                state === "completed"
-                  ? "bg-emerald-500"
-                  : state === "current"
-                    ? "bg-accent"
-                    : "bg-white";
-              const ring =
-                state === "pending"
-                  ? "border-border"
-                  : state === "current"
-                    ? "border-accent"
-                    : "border-emerald-500";
-
-              return (
-                <span key={`${step.stage}-${index}`} className="flex items-center justify-center">
-                  <span
-                    className={`h-3 w-3 rounded-full border ${ring} ${tone} ${
-                      state === "current" ? "animate-pulse" : ""
-                    }`}
-                  />
-                </span>
-              );
-            })}
-          </div>
-        </div>
+      <div className="mt-4">
+        <TrackingProgressBar steps={steps} />
       </div>
+
 
       <div className="mt-4 flex flex-wrap items-center justify-between gap-3 text-xs text-ink/60">
         <span>Submitted: {formatDate(complaint.submittedAt || complaint.createdAt)}</span>
