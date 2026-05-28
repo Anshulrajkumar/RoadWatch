@@ -173,9 +173,159 @@
       "completionMedia": null,
       "createdAt": "2026-05-28T08:17:47.377Z",
       "submittedAt": "2026-05-28T08:17:47.377Z"
+    },
+    {
+      "id": 4,
+      "complaintId": "RW-RD-BAG-2026-004",
+      "userId": null,
+      "roadCode": null,
+      "roadName": "Sālānpur",
+      "roadType": "Unknown",
+      "authority": "Unknown",
+      "assignedAuthority": "Unknown",
+      "engineerAssigned": "Executive Engineer (Roads)",
+      "district": "Baghmara-Cum-Katras",
+      "state": "Jharkhand",
+      "lat": 23.81658,
+      "lng": 86.291188,
+      "issueType": "Crack",
+      "description": "A complaint has been lodged regarding a crack and pothole on a municipal road. The defect is causing inconvenience to road users. Immediate attention is requested for repair and rectification.",
+      "summary": "Crack and pothole on Sālānpur road causing inconvenience to road users",
+      "severity": "Medium",
+      "priority": "Priority",
+      "riskScore": 60,
+      "mediaUrl": "http://localhost:4000/uploads/issues/1779970757658-facc003d1694.jpg",
+      "media": {
+        "imageUrl": "http://localhost:4000/uploads/issues/1779970757658-facc003d1694.jpg",
+        "videoUrl": null
+      },
+      "status": "Submitted",
+      "progressPercent": 20,
+      "estimatedCompletion": "2026-06-11",
+      "timeline": [
+        {
+          "stage": "Complaint Submitted",
+          "completed": true,
+          "current": true,
+          "timestamp": "2026-05-28T12:19:18.001Z",
+          "actor": "Citizen Portal",
+          "note": null
+        },
+        {
+          "stage": "Complaint Approved",
+          "completed": false,
+          "current": false,
+          "timestamp": null,
+          "actor": "Executive Engineer",
+          "note": null
+        },
+        {
+          "stage": "Assigned to Local Authority",
+          "completed": false,
+          "current": false,
+          "timestamp": null,
+          "actor": "District Control Room",
+          "note": "Assigned to Unknown."
+        },
+        {
+          "stage": "Work In Progress",
+          "completed": false,
+          "current": false,
+          "timestamp": null,
+          "actor": "PWD Division",
+          "note": "Work order issued and site mobilization started."
+        },
+        {
+          "stage": "Work Completed",
+          "completed": false,
+          "current": false,
+          "timestamp": null,
+          "actor": "Quality Audit Cell",
+          "note": null
+        }
+      ],
+      "satisfactionRating": null,
+      "completionMedia": null,
+      "createdAt": "2026-05-28T12:19:18.001Z",
+      "submittedAt": "2026-05-28T12:19:18.001Z"
+    },
+    {
+      "id": 5,
+      "complaintId": "RW-RD-BAG-2026-005",
+      "userId": null,
+      "roadCode": null,
+      "roadName": "Sālānpur",
+      "roadType": "Unknown",
+      "authority": "Unknown",
+      "assignedAuthority": "Unknown",
+      "engineerAssigned": "Executive Engineer (Roads)",
+      "district": "Baghmara-Cum-Katras",
+      "state": "Jharkhand",
+      "lat": 23.816329,
+      "lng": 86.291204,
+      "issueType": "Pothole",
+      "description": "Complaint of a pothole on the road. The pothole is present and causing inconvenience to road users. Immediate repair is requested.",
+      "summary": "Complaint of a pothole on the road. The pothole is present and causing inconvenience to road users. Immediate repair is requested.",
+      "severity": "High",
+      "priority": "Immediate",
+      "riskScore": 84,
+      "mediaUrl": "http://localhost:4000/uploads/issues/1779971198202-a645059ba7cc.jpg",
+      "media": {
+        "imageUrl": "http://localhost:4000/uploads/issues/1779971198202-a645059ba7cc.jpg",
+        "videoUrl": null
+      },
+      "status": "Submitted",
+      "progressPercent": 20,
+      "estimatedCompletion": "2026-06-11",
+      "timeline": [
+        {
+          "stage": "Complaint Submitted",
+          "completed": true,
+          "current": true,
+          "timestamp": "2026-05-28T12:26:40.092Z",
+          "actor": "Citizen Portal",
+          "note": null
+        },
+        {
+          "stage": "Complaint Approved",
+          "completed": false,
+          "current": false,
+          "timestamp": null,
+          "actor": "Executive Engineer",
+          "note": null
+        },
+        {
+          "stage": "Assigned to Local Authority",
+          "completed": false,
+          "current": false,
+          "timestamp": null,
+          "actor": "District Control Room",
+          "note": "Assigned to Unknown."
+        },
+        {
+          "stage": "Work In Progress",
+          "completed": false,
+          "current": false,
+          "timestamp": null,
+          "actor": "PWD Division",
+          "note": "Work order issued and site mobilization started."
+        },
+        {
+          "stage": "Work Completed",
+          "completed": false,
+          "current": false,
+          "timestamp": null,
+          "actor": "Quality Audit Cell",
+          "note": null
+        }
+      ],
+      "satisfactionRating": null,
+      "completionMedia": null,
+      "createdAt": "2026-05-28T12:26:40.092Z",
+      "submittedAt": "2026-05-28T12:26:40.092Z"
     }
   ],
   "counters": {
-    "RD-BAG-2026": 3
+    "RD-BAG-2026": 5
   }
 }

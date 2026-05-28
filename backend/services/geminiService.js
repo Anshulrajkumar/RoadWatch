@@ -61,7 +61,12 @@ const fallbackProject = (road, reason) => {
 
   const project = {
     projectId: buildProjectId(road),
-    contractor: "Government Empanelled Contractor",
+    contractors: [
+      {
+        name: "Government Empanelled Contractor",
+        registration: "Registered with State PWD",
+      },
+    ],
     sanctionedBudgetCrore: sanctioned,
     spentBudgetCrore: spent,
     maintenanceStatus: completion >= 85 ? "Completed" : "In Progress",
@@ -76,15 +81,24 @@ const fallbackProject = (road, reason) => {
   return project;
 };
 
-const buildPrompt = (road) => {
+/* ──────────────────────── Gemini API Integration ──────────────────────── */
+
+const buildGeminiPrompt = (road) => {
   const band = inferTypeBand(road);
   return (
-    "You are an Indian road infrastructure analyst. Generate a realistic project JSON. " +
-    "Return ONLY valid JSON without markdown or extra text.\n" +
+    "You are an expert Indian road infrastructure analyst with access to public government road project data. " +
+    "For the given road, provide REAL and ACCURATE project information based on publicly available data from NHAI, MoRTH, state PWD records, and PMGSY. " +
+    "If the exact road data is not available, provide the most realistic estimation based on similar roads in the same region.\n\n" +
+    "Return ONLY valid JSON without markdown, code fences, or extra text.\n" +
     "Schema:\n" +
     "{\n" +
     "  \"projectId\": string,\n" +
-    "  \"contractor\": string,\n" +
+    "  \"contractors\": [\n" +
+    "    {\n" +
+    "      \"name\": string (real contractor company name),\n" +
+    "      \"registration\": string (e.g. \"Registered with NHAI\" or \"State PWD Empanelled\")\n" +
+    "    }\n" +
+    "  ],\n" +
     "  \"sanctionedBudgetCrore\": number,\n" +
     "  \"spentBudgetCrore\": number,\n" +
     "  \"maintenanceStatus\": \"Planned\"|\"In Progress\"|\"Completed\"|\"Delayed\"|\"Needs Audit\",\n" +
@@ -98,6 +112,8 @@ const buildPrompt = (road) => {
     `- sanctionedBudgetCrore between ${band.min} and ${band.max}.\n` +
     "- spentBudgetCrore <= sanctionedBudgetCrore.\n" +
     "- completionPercentage between 0 and 100.\n" +
+    "- contractors array MUST have ALL contractors known for this road. If multiple contractors have worked on different segments/phases, list each one separately. Minimum 1, include as many as are relevant.\n" +
+    "- Use real Indian road construction company names that are known to work in the region.\n" +
     "- Use government-style, concise summary.\n" +
     "Context:\n" +
     JSON.stringify({
@@ -114,9 +130,126 @@ const buildPrompt = (road) => {
 const extractJson = (text) => {
   if (!text) return null;
   const trimmed = String(text).trim();
-  if (trimmed.startsWith("{")) return trimmed;
-  const match = trimmed.match(/\{[\s\S]*\}/);
+  // Remove markdown code fences if present
+  const cleaned = trimmed
+    .replace(/^```json\s*/i, "")
+    .replace(/^```\s*/i, "")
+    .replace(/\s*```$/i, "")
+    .trim();
+  if (cleaned.startsWith("{")) return cleaned;
+  const match = cleaned.match(/\{[\s\S]*\}/);
   return match ? match[0] : null;
+};
+
+const callGemini = async (prompt) => {
+  const geminiConfig = config.gemini;
+  if (!geminiConfig.apiKey) {
+    return null;
+  }
+
+  const url = `${geminiConfig.baseUrl}/models/${geminiConfig.model}:generateContent?key=${geminiConfig.apiKey}`;
+
+  for (let attempt = 0; attempt <= geminiConfig.retry; attempt += 1) {
+    try {
+      const response = await axios.post(
+        url,
+        {
+          contents: [
+            {
+              parts: [{ text: prompt }],
+            },
+          ],
+          generationConfig: {
+            temperature: 0.3,
+            topP: 0.9,
+            maxOutputTokens: 1024,
+          },
+        },
+        {
+          timeout: geminiConfig.timeoutMs,
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      const text = response?.data?.candidates?.[0]?.content?.parts?.[0]?.text;
+      return text || null;
+    } catch (error) {
+      const status = error?.response?.status;
+      const retryable = [429, 500, 502, 503, 504].includes(status);
+      if (attempt >= geminiConfig.retry || !retryable) {
+        throw error;
+      }
+      const waitMs = geminiConfig.retryDelayMs * (attempt + 1);
+      logger.warn("Gemini request failed, retrying", { attempt: attempt + 1, waitMs, status });
+      await new Promise((resolve) => setTimeout(resolve, waitMs));
+    }
+  }
+  return null;
+};
+
+/* ──────────────────────── Groq API (fallback) ──────────────────────── */
+
+const buildPrompt = (road) => {
+  const band = inferTypeBand(road);
+  return (
+    "You are an Indian road infrastructure analyst. Generate a realistic project JSON. " +
+    "Return ONLY valid JSON without markdown or extra text.\n" +
+    "Schema:\n" +
+    "{\n" +
+    "  \"projectId\": string,\n" +
+    "  \"contractors\": [\n" +
+    "    {\n" +
+    "      \"name\": string (real contractor company name),\n" +
+    "      \"registration\": string\n" +
+    "    }\n" +
+    "  ],\n" +
+    "  \"sanctionedBudgetCrore\": number,\n" +
+    "  \"spentBudgetCrore\": number,\n" +
+    "  \"maintenanceStatus\": \"Planned\"|\"In Progress\"|\"Completed\"|\"Delayed\"|\"Needs Audit\",\n" +
+    "  \"lastRelayingDate\": \"YYYY-MM-DD\",\n" +
+    "  \"riskLevel\": \"Low\"|\"Medium\"|\"High\",\n" +
+    "  \"auditStatus\": \"Verified\"|\"Pending\"|\"Flagged\",\n" +
+    "  \"completionPercentage\": number,\n" +
+    "  \"summary\": string\n" +
+    "}\n" +
+    "Constraints:\n" +
+    `- sanctionedBudgetCrore between ${band.min} and ${band.max}.\n` +
+    "- spentBudgetCrore <= sanctionedBudgetCrore.\n" +
+    "- completionPercentage between 0 and 100.\n" +
+    "- contractors must be an array of ALL contractors working on different segments/phases of this road. Use real Indian construction company names for the region.\n" +
+    "- Use government-style, concise summary.\n" +
+    "Context:\n" +
+    JSON.stringify({
+      roadCode: road.roadCode || null,
+      roadName: road.roadName || null,
+      district: road.district || null,
+      state: road.state || null,
+      type: road.type || null,
+      authority: road.authority || null,
+    })
+  );
+};
+
+const sanitizeContractors = (data) => {
+  // Handle both old single-contractor format and new array format
+  if (Array.isArray(data.contractors) && data.contractors.length > 0) {
+    return data.contractors.map((c, i) => ({
+      name: String(c.name || `Contractor ${i + 1}`).trim(),
+      registration: String(c.registration || "Government Empanelled").trim(),
+    }));
+  }
+  // Legacy single contractor field
+  if (data.contractor) {
+    return [
+      {
+        name: String(data.contractor).trim(),
+        registration: "Registered with State PWD",
+      },
+    ];
+  }
+  return [{ name: "Government Empanelled Contractor", registration: "Registered with State PWD" }];
 };
 
 const sanitizeProject = (data, road) => {
@@ -128,7 +261,7 @@ const sanitizeProject = (data, road) => {
 
   const project = {
     projectId: asString(data.projectId) || buildProjectId(road),
-    contractor: asString(data.contractor) || "Government Empanelled Contractor",
+    contractors: sanitizeContractors(data),
     sanctionedBudgetCrore: asNumber(data.sanctionedBudgetCrore),
     spentBudgetCrore: asNumber(data.spentBudgetCrore),
     maintenanceStatus: asString(data.maintenanceStatus) || "In Progress",
@@ -232,45 +365,66 @@ const callGroq = async (prompt) => {
   return null;
 };
 
+/* ──────────────────────── Main entry: Gemini first, then Groq fallback ──────────────────────── */
+
 const generateProjectInsights = async (road) => {
   if (!road) {
     return { project: null, meta: { source: "none" } };
   }
 
-  const cacheKey = `groq:${road.roadCode || ""}:${road.district || ""}:${road.state || ""}:${road.type || ""}`;
+  const cacheKey = `project:${road.roadCode || ""}:${road.district || ""}:${road.state || ""}:${road.type || ""}`;
   const cached = cache.get(cacheKey);
   if (cached) {
     return { project: cached.project, meta: { ...cached.meta, cache: "hit" } };
   }
 
-  if (!config.groq.apiKey) {
-    const project = fallbackProject(road, "missing-api-key");
-    const result = { project, meta: { source: "fallback", cache: "miss" } };
-    cache.set(cacheKey, result);
-    return result;
+  // ── Try Gemini first ──
+  if (config.gemini.apiKey) {
+    try {
+      const prompt = buildGeminiPrompt(road);
+      const text = await callGemini(prompt);
+      const json = extractJson(text);
+      if (json) {
+        const parsed = JSON.parse(json);
+        const project = sanitizeProject(parsed, road);
+        const result = { project, meta: { source: "gemini", cache: "miss" } };
+        cache.set(cacheKey, result);
+        return result;
+      }
+      logger.warn("Gemini returned no parseable JSON, falling back to Groq");
+    } catch (error) {
+      logger.warn("Gemini enrichment failed, falling back to Groq", { message: error.message });
+    }
   }
 
-  try {
-    const prompt = buildPrompt(road);
-    const response = await callGroq(prompt);
-    const text = response?.data?.choices?.[0]?.message?.content;
-    const json = extractJson(text);
-    if (!json) {
-      throw new Error("Groq response missing JSON");
+  // ── Try Groq as fallback ──
+  if (config.groq.apiKey) {
+    try {
+      const prompt = buildPrompt(road);
+      const response = await callGroq(prompt);
+      const text = response?.data?.choices?.[0]?.message?.content;
+      const json = extractJson(text);
+      if (!json) {
+        throw new Error("Groq response missing JSON");
+      }
+      const parsed = JSON.parse(json);
+      const project = sanitizeProject(parsed, road);
+      const result = { project, meta: { source: "groq", cache: "miss" } };
+      cache.set(cacheKey, result);
+      return result;
+    } catch (error) {
+      logger.warn("Groq enrichment failed", { message: error.message });
     }
-    const parsed = JSON.parse(json);
-    const project = sanitizeProject(parsed, road);
-    const result = { project, meta: { source: "groq", cache: "miss" } };
-    cache.set(cacheKey, result);
-    return result;
-  } catch (error) {
-    logger.warn("Groq enrichment failed", { message: error.message });
-    const project = fallbackProject(road, "groq-error");
-    const result = { project, meta: { source: "fallback", cache: "miss" } };
-    cache.set(cacheKey, result);
-    return result;
   }
+
+  // ── Deterministic fallback ──
+  const project = fallbackProject(road, "all-apis-unavailable");
+  const result = { project, meta: { source: "fallback", cache: "miss" } };
+  cache.set(cacheKey, result);
+  return result;
 };
+
+/* ──────────────────────── Issue Insights (uses Gemini) ──────────────────────── */
 
 const issueDefaults = {
   Pothole: { severity: "High", priority: "Immediate", riskScore: 84, dangerLevel: "High", impact: "Severe" },
@@ -366,7 +520,7 @@ const sanitizeIssueInsights = (data, payload) => {
     impact: asString(data.impact) || fallback.impact,
     riskScore: asNumber(data.riskScore),
     summary: asString(data.summary) || fallback.summary,
-    meta: { source: "groq" },
+    meta: { source: "gemini" },
   };
 
   if (!Number.isFinite(result.riskScore)) {
@@ -388,7 +542,7 @@ const generateIssueInsights = async (payload) => {
     return { ...cached, meta: { ...cached.meta, cache: "hit" } };
   }
 
-  if (!config.groq.apiKey) {
+  if (!config.gemini.apiKey) {
     const fallback = fallbackIssueInsights(payload, "missing-api-key");
     const result = { ...fallback, meta: { ...fallback.meta, cache: "miss" } };
     cache.set(cacheKey, result);
@@ -397,19 +551,18 @@ const generateIssueInsights = async (payload) => {
 
   try {
     const prompt = buildIssuePrompt(payload);
-    const response = await callGroq(prompt);
-    const text = response?.data?.choices?.[0]?.message?.content;
+    const text = await callGemini(prompt);
     const json = extractJson(text);
     if (!json) {
-      throw new Error("Groq response missing JSON");
+      throw new Error("Gemini response missing JSON");
     }
     const parsed = JSON.parse(json);
     const result = sanitizeIssueInsights(parsed, payload);
     cache.set(cacheKey, result);
     return result;
   } catch (error) {
-    logger.warn("Groq issue insights failed", { message: error.message });
-    const fallback = fallbackIssueInsights(payload, "groq-error");
+    logger.warn("Gemini issue insights failed", { message: error.message });
+    const fallback = fallbackIssueInsights(payload, "gemini-error");
     const result = { ...fallback, meta: { ...fallback.meta, cache: "miss" } };
     cache.set(cacheKey, result);
     return result;
