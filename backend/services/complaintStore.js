@@ -8,7 +8,9 @@ const { logger } = require("../utils/logger");
 let complaints = [];
 let counters = new Map();
 
-const dataDir = path.join(__dirname, "..", "data");
+const dataDir = process.env.VERCEL
+  ? path.join("/tmp", "data")
+  : path.join(__dirname, "..", "data");
 const storeFile = path.join(dataDir, "complaints.json");
 
 const toAbbr = (value) => {

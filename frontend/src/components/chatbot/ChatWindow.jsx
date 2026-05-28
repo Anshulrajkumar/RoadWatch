@@ -4,7 +4,7 @@ import ChatMessage from "./ChatMessage";
 import TypingIndicator from "./TypingIndicator";
 import SuggestedPrompts from "./SuggestedPrompts";
 
-const API_URL = "http://localhost:4000/api/chatbot/message";
+const API_URL = "/api/chatbot/message";
 
 const ChatWindow = ({ onClose, currentPage }) => {
   const [messages, setMessages] = useState(() => {

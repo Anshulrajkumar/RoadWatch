@@ -10,7 +10,9 @@ const { reportIssue, rewriteDescription, listComplaintHistory } = require("../co
 
 const router = express.Router();
 
-const uploadDir = path.join(__dirname, "..", "uploads", "issues");
+const uploadDir = process.env.VERCEL
+  ? path.join("/tmp", "uploads", "issues")
+  : path.join(__dirname, "..", "uploads", "issues");
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
