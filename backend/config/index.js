@@ -16,10 +16,10 @@ const config = {
     retry: 2,
     retryDelayMs: 800,
   },
-  gemini: {
-    apiKey: process.env.GEMINI_API_KEY || "",
-    model: "gemini-1.5-flash",
-    baseUrl: "https://generativelanguage.googleapis.com/v1beta",
+  groq: {
+    apiKey: process.env.GROQ_API || process.env.GROQ_API_KEY || "",
+    model: "llama-3.1-8b-instant",
+    baseUrl: "https://api.groq.com/openai/v1",
     timeoutMs: 12000,
     retry: 1,
     retryDelayMs: 800,

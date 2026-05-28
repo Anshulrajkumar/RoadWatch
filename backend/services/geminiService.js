@@ -159,35 +159,38 @@ const sanitizeProject = (data, road) => {
 
 const getModelCandidates = () => {
   const list = [
-    config.gemini.model,
-    "gemini-1.5-flash-latest",
-    "gemini-1.5-pro-latest",
-    "gemini-1.0-pro",
+    config.groq.model,
+    "llama-3.1-8b-instant",
+    "llama-3.1-70b-versatile",
+    "llama3-8b-8192",
+    "llama3-70b-8192",
+    "mixtral-8x7b-32768",
+    "gemma2-9b-it",
   ];
   return [...new Set(list.filter(Boolean))];
 };
 
-const callGeminiModel = async (prompt, model) => {
-  const url = `${config.gemini.baseUrl}/models/${model}:generateContent?key=${config.gemini.apiKey}`;
+const callGroqModel = async (prompt, model) => {
+  const url = `${config.groq.baseUrl}/chat/completions`;
 
-  for (let attempt = 0; attempt <= config.gemini.retry; attempt += 1) {
+  for (let attempt = 0; attempt <= config.groq.retry; attempt += 1) {
     try {
       return await axios.post(
         url,
         {
-          contents: [
-            {
-              role: "user",
-              parts: [{ text: prompt }],
-            },
-          ],
-          generationConfig: {
-            temperature: 0.4,
-            topP: 0.9,
-            maxOutputTokens: 512,
-          },
+          model,
+          messages: [{ role: "user", content: prompt }],
+          temperature: 0.4,
+          top_p: 0.9,
+          max_tokens: 512,
         },
-        { timeout: config.gemini.timeoutMs }
+        {
+          timeout: config.groq.timeoutMs,
+          headers: {
+            Authorization: `Bearer ${config.groq.apiKey}`,
+            "Content-Type": "application/json",
+          },
+        }
       );
     } catch (error) {
       const status = error?.response?.status;
@@ -195,28 +198,28 @@ const callGeminiModel = async (prompt, model) => {
         throw error;
       }
       const retryable = [429, 500, 502, 503, 504].includes(status);
-      if (attempt >= config.gemini.retry || !retryable) {
+      if (attempt >= config.groq.retry || !retryable) {
         throw error;
       }
-      const waitMs = config.gemini.retryDelayMs * (attempt + 1);
-      logger.warn("Gemini request failed, retrying", { attempt: attempt + 1, waitMs });
+      const waitMs = config.groq.retryDelayMs * (attempt + 1);
+      logger.warn("Groq request failed, retrying", { attempt: attempt + 1, waitMs });
       await new Promise((resolve) => setTimeout(resolve, waitMs));
     }
   }
   return null;
 };
 
-const callGemini = async (prompt) => {
+const callGroq = async (prompt) => {
   let lastError = null;
 
   for (const model of getModelCandidates()) {
     try {
-      return await callGeminiModel(prompt, model);
+      return await callGroqModel(prompt, model);
     } catch (error) {
       lastError = error;
       const status = error?.response?.status;
       if (status === 404) {
-        logger.warn("Gemini model not found", { model });
+        logger.warn("Groq model not found", { model });
         continue;
       }
       throw error;
@@ -234,13 +237,13 @@ const generateProjectInsights = async (road) => {
     return { project: null, meta: { source: "none" } };
   }
 
-  const cacheKey = `gemini:${road.roadCode || ""}:${road.district || ""}:${road.state || ""}:${road.type || ""}`;
+  const cacheKey = `groq:${road.roadCode || ""}:${road.district || ""}:${road.state || ""}:${road.type || ""}`;
   const cached = cache.get(cacheKey);
   if (cached) {
     return { project: cached.project, meta: { ...cached.meta, cache: "hit" } };
   }
 
-  if (!config.gemini.apiKey) {
+  if (!config.groq.apiKey) {
     const project = fallbackProject(road, "missing-api-key");
     const result = { project, meta: { source: "fallback", cache: "miss" } };
     cache.set(cacheKey, result);
@@ -249,24 +252,218 @@ const generateProjectInsights = async (road) => {
 
   try {
     const prompt = buildPrompt(road);
-    const response = await callGemini(prompt);
-    const text = response?.data?.candidates?.[0]?.content?.parts?.[0]?.text;
+    const response = await callGroq(prompt);
+    const text = response?.data?.choices?.[0]?.message?.content;
     const json = extractJson(text);
     if (!json) {
-      throw new Error("Gemini response missing JSON");
+      throw new Error("Groq response missing JSON");
     }
     const parsed = JSON.parse(json);
     const project = sanitizeProject(parsed, road);
-    const result = { project, meta: { source: "gemini", cache: "miss" } };
+    const result = { project, meta: { source: "groq", cache: "miss" } };
     cache.set(cacheKey, result);
     return result;
   } catch (error) {
-    logger.warn("Gemini enrichment failed", { message: error.message });
-    const project = fallbackProject(road, "gemini-error");
+    logger.warn("Groq enrichment failed", { message: error.message });
+    const project = fallbackProject(road, "groq-error");
     const result = { project, meta: { source: "fallback", cache: "miss" } };
     cache.set(cacheKey, result);
     return result;
   }
 };
 
-module.exports = { generateProjectInsights };
+const issueDefaults = {
+  Pothole: { severity: "High", priority: "Immediate", riskScore: 84, dangerLevel: "High", impact: "Severe" },
+  Crack: { severity: "Medium", priority: "Priority", riskScore: 58, dangerLevel: "Medium", impact: "Moderate" },
+  Waterlogging: { severity: "Medium", priority: "Priority", riskScore: 62, dangerLevel: "Medium", impact: "Moderate" },
+  "Broken Divider": { severity: "High", priority: "Immediate", riskScore: 78, dangerLevel: "High", impact: "Severe" },
+  "Faded Markings": { severity: "Low", priority: "Routine", riskScore: 32, dangerLevel: "Low", impact: "Minor" },
+  "Road Collapse": { severity: "Critical", priority: "Immediate", riskScore: 92, dangerLevel: "High", impact: "Severe" },
+  "Drainage Issue": { severity: "Medium", priority: "Priority", riskScore: 55, dangerLevel: "Medium", impact: "Moderate" },
+  Other: { severity: "Medium", priority: "Priority", riskScore: 50, dangerLevel: "Medium", impact: "Moderate" },
+};
+
+const getIssueBaseline = (issueType) => {
+  const normalized = String(issueType || "Other").trim();
+  return issueDefaults[normalized] || issueDefaults.Other;
+};
+
+const buildIssuePrompt = ({ issueType, description, road, coordinates }) => {
+  return (
+    "You are an Indian road safety analyst. Generate realistic issue severity JSON. " +
+    "Return ONLY valid JSON without markdown or extra text.\n" +
+    "Schema:\n" +
+    "{\n" +
+    "  \"severity\": \"Low\"|\"Medium\"|\"High\"|\"Critical\",\n" +
+    "  \"priority\": \"Routine\"|\"Priority\"|\"Immediate\",\n" +
+    "  \"dangerLevel\": \"Low\"|\"Medium\"|\"High\",\n" +
+    "  \"impact\": \"Minor\"|\"Moderate\"|\"Severe\",\n" +
+    "  \"riskScore\": number,\n" +
+    "  \"summary\": string\n" +
+    "}\n" +
+    "Constraints:\n" +
+    "- riskScore between 0 and 100.\n" +
+    "- summary must be concise and official.\n" +
+    "Context:\n" +
+    JSON.stringify({
+      issueType: issueType || null,
+      description: description || null,
+      roadCode: road?.roadCode || null,
+      roadName: road?.roadName || null,
+      roadType: road?.type || null,
+      authority: road?.authority || null,
+      district: road?.district || null,
+      state: road?.state || null,
+      coordinates: coordinates || null,
+    })
+  );
+};
+
+const buildRewritePrompt = ({ issueType, description }) => {
+  return (
+    "You are a civic complaint editor. Rewrite the user's description into a clear, concise report for municipal engineers. " +
+    "Keep the meaning, do not add new facts, and do not mention that it was rewritten. " +
+    "Return ONLY the rewritten description, no quotes, no markdown.\n" +
+    "Guidelines:\n" +
+    "- 1 to 3 sentences.\n" +
+    "- Use formal Indian English.\n" +
+    "- Keep length under 300 characters.\n" +
+    "Context:\n" +
+    JSON.stringify({
+      issueType: issueType || null,
+      description: description || null,
+    })
+  );
+};
+
+const fallbackIssueInsights = (payload, reason) => {
+  const base = getIssueBaseline(payload.issueType);
+  return {
+    severity: base.severity,
+    priority: base.priority,
+    dangerLevel: base.dangerLevel,
+    impact: base.impact,
+    riskScore: base.riskScore,
+    summary:
+      payload.description?.slice(0, 140) ||
+      `Reported ${payload.issueType || "road issue"} requires assessment.`,
+    meta: { source: "fallback", reason },
+  };
+};
+
+const sanitizeIssueInsights = (data, payload) => {
+  const asString = (value) => (value ? String(value).trim() : null);
+  const asNumber = (value) => {
+    const num = Number(value);
+    return Number.isFinite(num) ? num : null;
+  };
+  const fallback = fallbackIssueInsights(payload, "fallback-normalization");
+
+  const result = {
+    severity: asString(data.severity) || fallback.severity,
+    priority: asString(data.priority) || fallback.priority,
+    dangerLevel: asString(data.dangerLevel) || fallback.dangerLevel,
+    impact: asString(data.impact) || fallback.impact,
+    riskScore: asNumber(data.riskScore),
+    summary: asString(data.summary) || fallback.summary,
+    meta: { source: "groq" },
+  };
+
+  if (!Number.isFinite(result.riskScore)) {
+    result.riskScore = fallback.riskScore;
+  }
+
+  result.riskScore = clamp(result.riskScore, 0, 100);
+  return result;
+};
+
+const generateIssueInsights = async (payload) => {
+  if (!payload) {
+    return fallbackIssueInsights({ issueType: "Other" }, "missing-payload");
+  }
+
+  const cacheKey = `issue:${payload.issueType || ""}:${payload.road?.roadCode || ""}:${payload.road?.district || ""}`;
+  const cached = cache.get(cacheKey);
+  if (cached) {
+    return { ...cached, meta: { ...cached.meta, cache: "hit" } };
+  }
+
+  if (!config.groq.apiKey) {
+    const fallback = fallbackIssueInsights(payload, "missing-api-key");
+    const result = { ...fallback, meta: { ...fallback.meta, cache: "miss" } };
+    cache.set(cacheKey, result);
+    return result;
+  }
+
+  try {
+    const prompt = buildIssuePrompt(payload);
+    const response = await callGroq(prompt);
+    const text = response?.data?.choices?.[0]?.message?.content;
+    const json = extractJson(text);
+    if (!json) {
+      throw new Error("Groq response missing JSON");
+    }
+    const parsed = JSON.parse(json);
+    const result = sanitizeIssueInsights(parsed, payload);
+    cache.set(cacheKey, result);
+    return result;
+  } catch (error) {
+    logger.warn("Groq issue insights failed", { message: error.message });
+    const fallback = fallbackIssueInsights(payload, "groq-error");
+    const result = { ...fallback, meta: { ...fallback.meta, cache: "miss" } };
+    cache.set(cacheKey, result);
+    return result;
+  }
+};
+
+const sanitizeRewrite = (text, fallback) => {
+  if (!text) return fallback;
+  const cleaned = String(text).trim().replace(/^"|"$/g, "");
+  if (!cleaned) return fallback;
+  return cleaned.length > 320 ? cleaned.slice(0, 320).trim() : cleaned;
+};
+
+const rewriteIssueDescription = async ({ issueType, description }) => {
+  const trimmed = String(description || "").trim();
+  if (!trimmed) {
+    return { description: "", meta: { source: "none" } };
+  }
+
+  const cacheKey = `rewrite:${issueType || ""}:${hashString(trimmed)}`;
+  const cached = cache.get(cacheKey);
+  if (cached) {
+    return { ...cached, meta: { ...cached.meta, cache: "hit" } };
+  }
+
+  if (!config.groq.apiKey) {
+    const result = {
+      description: trimmed,
+      meta: { source: "fallback", reason: "missing-api-key", cache: "miss" },
+    };
+    cache.set(cacheKey, result);
+    return result;
+  }
+
+  try {
+    const prompt = buildRewritePrompt({ issueType, description: trimmed });
+    const response = await callGroq(prompt);
+    const text = response?.data?.choices?.[0]?.message?.content;
+    if (!text) {
+      throw new Error("Groq response missing description");
+    }
+    const rewritten = sanitizeRewrite(text, trimmed);
+    const result = { description: rewritten, meta: { source: "groq", cache: "miss" } };
+    cache.set(cacheKey, result);
+    return result;
+  } catch (error) {
+    logger.warn("Groq rewrite failed", { message: error.message });
+    const result = {
+      description: trimmed,
+      meta: { source: "fallback", reason: "groq-error", cache: "miss" },
+    };
+    cache.set(cacheKey, result);
+    return result;
+  }
+};
+
+module.exports = { generateProjectInsights, generateIssueInsights, rewriteIssueDescription };

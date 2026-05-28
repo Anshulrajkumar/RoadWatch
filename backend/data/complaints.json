@@ -1,0 +1,181 @@
+{
+  "complaints": [
+    {
+      "id": 1,
+      "complaintId": "RW-RD-BAG-2026-001",
+      "roadCode": null,
+      "roadName": "Sālānpur",
+      "roadType": "Unknown",
+      "authority": "Unknown",
+      "district": "Baghmara-Cum-Katras",
+      "state": "Jharkhand",
+      "lat": 23.816751,
+      "lng": 86.290984,
+      "issueType": "Pothole",
+      "description": "Complaint of a large pothole on the road, causing potential damage to vehicles. Location is unspecified. Request for prompt repair is made.",
+      "severity": "Medium",
+      "priority": "Priority",
+      "riskScore": 70,
+      "mediaUrl": "http://localhost:4000/uploads/issues/1779885630425-e95003847a97.jpg",
+      "media": {
+        "imageUrl": "http://localhost:4000/uploads/issues/1779885630425-e95003847a97.jpg",
+        "videoUrl": null
+      },
+      "status": "Submitted",
+      "createdAt": "2026-05-27T12:40:30.670Z"
+    },
+    {
+      "id": 2,
+      "complaintId": "RW-RD-BAG-2026-002",
+      "userId": null,
+      "roadCode": null,
+      "roadName": "Sālānpur",
+      "roadType": "Unknown",
+      "authority": "Unknown",
+      "assignedAuthority": "Unknown",
+      "engineerAssigned": "Executive Engineer (Roads)",
+      "district": "Baghmara-Cum-Katras",
+      "state": "Jharkhand",
+      "lat": 23.816567,
+      "lng": 86.291089,
+      "issueType": "Pothole",
+      "description": "Complaint of Pothole on Road: A pothole has developed on the road, causing inconvenience to commuters. Location details are required for further action.",
+      "summary": "Pothole on Sālānpur Road, Baghmara-Cum-Katras, Jharkhand",
+      "severity": "Medium",
+      "priority": "Priority",
+      "riskScore": 60,
+      "mediaUrl": "http://localhost:4000/uploads/issues/1779892900283-e674e9c8831d.jpg",
+      "media": {
+        "imageUrl": "http://localhost:4000/uploads/issues/1779892900283-e674e9c8831d.jpg",
+        "videoUrl": null
+      },
+      "status": "Submitted",
+      "progressPercent": 20,
+      "estimatedCompletion": "2026-06-10",
+      "timeline": [
+        {
+          "stage": "Complaint Submitted",
+          "completed": true,
+          "current": true,
+          "timestamp": "2026-05-27T14:41:40.743Z",
+          "actor": "Citizen Portal",
+          "note": null
+        },
+        {
+          "stage": "Complaint Approved",
+          "completed": false,
+          "current": false,
+          "timestamp": null,
+          "actor": "Executive Engineer",
+          "note": null
+        },
+        {
+          "stage": "Assigned to Local Authority",
+          "completed": false,
+          "current": false,
+          "timestamp": null,
+          "actor": "District Control Room",
+          "note": "Assigned to Unknown."
+        },
+        {
+          "stage": "Work In Progress",
+          "completed": false,
+          "current": false,
+          "timestamp": null,
+          "actor": "PWD Division",
+          "note": "Work order issued and site mobilization started."
+        },
+        {
+          "stage": "Work Completed",
+          "completed": false,
+          "current": false,
+          "timestamp": null,
+          "actor": "Quality Audit Cell",
+          "note": null
+        }
+      ],
+      "satisfactionRating": null,
+      "completionMedia": null,
+      "createdAt": "2026-05-27T14:41:40.743Z",
+      "submittedAt": "2026-05-27T14:41:40.743Z"
+    },
+    {
+      "id": 3,
+      "complaintId": "RW-RD-BAG-2026-003",
+      "userId": null,
+      "roadCode": null,
+      "roadName": "Sālānpur",
+      "roadType": "Unknown",
+      "authority": "Unknown",
+      "assignedAuthority": "Unknown",
+      "engineerAssigned": "Executive Engineer (Roads)",
+      "district": "Baghmara-Cum-Katras",
+      "state": "Jharkhand",
+      "lat": 23.816755,
+      "lng": 86.29108,
+      "issueType": "Pothole",
+      "description": "A pothole has developed on the road, necessitating prompt attention from municipal authorities for repair and maintenance.",
+      "summary": "Pothole on Sālānpur road in Baghmara-Cum-Katras, Jharkhand, requires immediate attention for repair and maintenance.",
+      "severity": "Medium",
+      "priority": "Priority",
+      "riskScore": 60,
+      "mediaUrl": "http://localhost:4000/uploads/issues/1779956266907-68e84a45bdd0.jpg",
+      "media": {
+        "imageUrl": "http://localhost:4000/uploads/issues/1779956266907-68e84a45bdd0.jpg",
+        "videoUrl": null
+      },
+      "status": "Submitted",
+      "progressPercent": 20,
+      "estimatedCompletion": "2026-06-11",
+      "timeline": [
+        {
+          "stage": "Complaint Submitted",
+          "completed": true,
+          "current": true,
+          "timestamp": "2026-05-28T08:17:47.377Z",
+          "actor": "Citizen Portal",
+          "note": null
+        },
+        {
+          "stage": "Complaint Approved",
+          "completed": false,
+          "current": false,
+          "timestamp": null,
+          "actor": "Executive Engineer",
+          "note": null
+        },
+        {
+          "stage": "Assigned to Local Authority",
+          "completed": false,
+          "current": false,
+          "timestamp": null,
+          "actor": "District Control Room",
+          "note": "Assigned to Unknown."
+        },
+        {
+          "stage": "Work In Progress",
+          "completed": false,
+          "current": false,
+          "timestamp": null,
+          "actor": "PWD Division",
+          "note": "Work order issued and site mobilization started."
+        },
+        {
+          "stage": "Work Completed",
+          "completed": false,
+          "current": false,
+          "timestamp": null,
+          "actor": "Quality Audit Cell",
+          "note": null
+        }
+      ],
+      "satisfactionRating": null,
+      "completionMedia": null,
+      "createdAt": "2026-05-28T08:17:47.377Z",
+      "submittedAt": "2026-05-28T08:17:47.377Z"
+    }
+  ],
+  "counters": {
+    "RD-BAG-2026": 3
+  }
+}
