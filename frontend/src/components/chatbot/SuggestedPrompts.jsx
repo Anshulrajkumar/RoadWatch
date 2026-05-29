@@ -1,12 +1,12 @@
 import { motion } from "framer-motion";
 
 const suggestions = [
-  { label: "🕳️ Report a pothole", message: "How do I report a pothole?" },
-  { label: "📍 Track complaint", message: "How do I track my complaint status?" },
-  { label: "🔍 Search a road", message: "How do I search for a road?" },
-  { label: "🛣️ NH/SH/MDR?", message: "What do NH, SH, and MDR mean?" },
-  { label: "📊 Dashboard help", message: "How do I use the dashboard?" },
-  { label: "💰 Budget info", message: "How can I check budget transparency for a road?" },
+  { label: "Report a pothole", message: "How do I report a pothole?" },
+  { label: "Track complaint", message: "How do I track my complaint status?" },
+  { label: "Search a road", message: "How do I search for a road?" },
+  { label: "NH/SH/MDR?", message: "What do NH, SH, and MDR mean?" },
+  { label: "Dashboard help", message: "How do I use the dashboard?" },
+  { label: "Budget info", message: "How can I check budget transparency for a road?" },
 ];
 
 const SuggestedPrompts = ({ onSelect }) => (
