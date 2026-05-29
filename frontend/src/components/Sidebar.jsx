@@ -1,11 +1,5 @@
 import { useEffect, useState } from "react";
 
-const roadTypes = [
-  { code: "NH", label: "National Highway (NH)", color: "bg-[#f28c28]" },
-  { code: "SH", label: "State Highway (SH)", color: "bg-[#f2c94c]" },
-  { code: "MDR", label: "Major District Road (MDR)", color: "bg-[#3a9b5c]" },
-];
-
 const Sidebar = ({ onUseLocation, onSubmitRoadName, onSubmitCoords, loading, coords, error }) => {
   const [draftLat, setDraftLat] = useState("");
   const [draftLng, setDraftLng] = useState("");
@@ -52,7 +46,7 @@ const Sidebar = ({ onUseLocation, onSubmitRoadName, onSubmitCoords, loading, coo
       </div>
 
       <button
-        className="w-full rounded-md bg-navy px-4 py-3 text-sm font-semibold uppercase tracking-[0.1em] text-white shadow-soft transition hover:bg-navy-deep"
+        className="w-full rounded-none bg-navy px-4 py-3 text-sm font-semibold uppercase tracking-[0.1em] text-white shadow-soft transition hover:bg-navy-deep"
         onClick={onUseLocation}
         disabled={loading}
       >
@@ -81,7 +75,7 @@ const Sidebar = ({ onUseLocation, onSubmitRoadName, onSubmitCoords, loading, coo
             placeholder="Enter road name (for example NH44)"
           />
           <button
-            className="w-full border border-navy px-4 py-3 text-sm font-semibold uppercase tracking-[0.1em] text-navy transition hover:border-accent hover:text-accent"
+            className="w-full rounded-none bg-navy px-4 py-3 text-sm font-semibold uppercase tracking-[0.1em] text-white shadow-soft transition hover:bg-navy-deep"
             onClick={handleRoadSearch}
             disabled={loading}
           >
@@ -113,7 +107,7 @@ const Sidebar = ({ onUseLocation, onSubmitRoadName, onSubmitCoords, loading, coo
             placeholder="Enter longitude"
           />
           <button
-            className="w-full border border-navy px-4 py-3 text-sm font-semibold uppercase tracking-[0.1em] text-navy transition hover:border-accent hover:text-accent"
+            className="w-full rounded-none bg-navy px-4 py-3 text-sm font-semibold uppercase tracking-[0.1em] text-white shadow-soft transition hover:bg-navy-deep"
             onClick={handleSubmit}
             disabled={loading}
           >
@@ -132,21 +126,6 @@ const Sidebar = ({ onUseLocation, onSubmitRoadName, onSubmitCoords, loading, coo
           {error}
         </div>
       ) : null}
-
-      <div className="space-y-3">
-        <p className="small-caps text-ink/60">Road Types Near You</p>
-        <div className="space-y-2">
-          {roadTypes.map((type) => (
-            <div
-              key={type.code}
-              className="flex items-center gap-3 rounded-md border border-border bg-white px-3 py-2 text-sm"
-            >
-              <span className={`h-3 w-3 rounded-full ${type.color}`} />
-              <span className="text-ink/80">{type.label}</span>
-            </div>
-          ))}
-        </div>
-      </div>
 
       <button className="w-full rounded-md border border-navy px-4 py-3 text-sm font-semibold uppercase tracking-[0.1em] text-navy transition hover:border-accent hover:text-accent">
         Reset Filters
