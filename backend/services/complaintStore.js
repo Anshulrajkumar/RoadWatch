@@ -1,29 +1,17 @@
 "use strict";
 
-const fs = require("fs");
-const path = require("path");
-
+const { createClient } = require("@supabase/supabase-js");
 const { logger } = require("../utils/logger");
 
-let complaints = [];
-let counters = new Map();
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY;
 
-const dataDir = process.env.VERCEL
-  ? path.join("/tmp", "data")
-  : path.join(__dirname, "..", "data");
-const storeFile = path.join(dataDir, "complaints.json");
-
-const toAbbr = (value) => {
-  if (!value) return "UNK";
-  const letters = String(value).replace(/[^A-Za-z]/g, "");
-  if (!letters) return "UNK";
-  return letters.slice(0, 3).toUpperCase();
-};
-
-const normalizeRoadCode = (value) => {
-  if (!value) return "RD";
-  return String(value).replace(/\s+/g, "").toUpperCase();
-};
+let supabase = null;
+if (supabaseUrl && supabaseKey) {
+  supabase = createClient(supabaseUrl, supabaseKey);
+} else {
+  logger.warn("SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY missing in .env. Database operations will fail.");
+}
 
 const timelineStages = [
   { stage: "Complaint Submitted", actor: "Citizen Portal" },
@@ -76,168 +64,129 @@ const buildTimeline = (status, createdAt, assignedAuthority) => {
   });
 };
 
-const parseComplaintKey = (complaintId) => {
-  if (!complaintId) return null;
-  const parts = String(complaintId).split("-");
-  if (parts.length < 5 || parts[0] !== "RW") return null;
+const createComplaint = async (payload) => {
+  if (!supabase) throw new Error("Supabase is not configured.");
 
-  const sequence = Number(parts.pop());
-  const year = parts.pop();
-  const districtCode = parts.pop();
-  const roadCode = parts.slice(1).join("-");
-
-  if (!Number.isFinite(sequence) || !year || !districtCode) return null;
-
-  return {
-    key: `${roadCode}-${districtCode}-${year}`,
-    sequence,
-  };
-};
-
-const rebuildCountersFromComplaints = () => {
-  const next = new Map(counters);
-  for (const complaint of complaints) {
-    const parsed = parseComplaintKey(complaint.complaintId);
-    if (!parsed) continue;
-    const current = next.get(parsed.key) || 0;
-    if (parsed.sequence > current) {
-      next.set(parsed.key, parsed.sequence);
-    }
-  }
-  counters = next;
-};
-
-const loadStore = () => {
-  try {
-    if (!fs.existsSync(storeFile)) return;
-    const raw = fs.readFileSync(storeFile, "utf8");
-    if (!raw) return;
-    const parsed = JSON.parse(raw);
-
-    if (Array.isArray(parsed)) {
-      complaints = parsed;
-      rebuildCountersFromComplaints();
-      return;
-    }
-
-    complaints = Array.isArray(parsed.complaints) ? parsed.complaints : [];
-    counters = new Map();
-    if (parsed.counters && typeof parsed.counters === "object") {
-      for (const [key, value] of Object.entries(parsed.counters)) {
-        const num = Number(value);
-        counters.set(key, Number.isFinite(num) ? num : 0);
-      }
-    }
-    rebuildCountersFromComplaints();
-  } catch (error) {
-    logger.warn("Failed to load complaint store", { message: error.message });
-  }
-};
-
-const persistStore = () => {
-  try {
-    fs.mkdirSync(dataDir, { recursive: true });
-    const countersObject = {};
-    for (const [key, value] of counters.entries()) {
-      countersObject[key] = value;
-    }
-    const payload = JSON.stringify({ complaints, counters: countersObject }, null, 2);
-    fs.writeFileSync(storeFile, payload);
-  } catch (error) {
-    logger.warn("Failed to persist complaint store", { message: error.message });
-  }
-};
-
-const getSequence = (key) => {
-  const current = counters.get(key) || 0;
-  const next = current + 1;
-  counters.set(key, next);
-  return String(next).padStart(3, "0");
-};
-
-const buildComplaintId = ({ roadCode, district, state, year }) => {
-  const code = normalizeRoadCode(roadCode);
-  const districtCode = toAbbr(district) !== "UNK" ? toAbbr(district) : toAbbr(state);
-  const key = `${code}-${districtCode}-${year}`;
-  const sequence = getSequence(key);
-  return `RW-${code}-${districtCode}-${year}-${sequence}`;
-};
-
-const createComplaint = (payload) => {
-  const createdAt = new Date();
-  const status = payload.status || "Submitted";
-  const assignedAuthority = payload.assignedAuthority || payload.authority || "District PWD";
-  const engineerAssigned = payload.engineerAssigned || "Executive Engineer (Roads)";
-  const estimatedCompletion = payload.estimatedCompletion || addDays(createdAt, 14).toISOString().slice(0, 10);
-  const timeline =
-    Array.isArray(payload.timeline) && payload.timeline.length
-      ? payload.timeline
-      : buildTimeline(status, createdAt, assignedAuthority);
-  const progressPercent =
-    typeof payload.progressPercent === "number" ? payload.progressPercent : deriveProgressPercent(status);
-  const complaintId = buildComplaintId({
-    roadCode: payload.roadCode,
-    district: payload.district,
-    state: payload.state,
-    year: createdAt.getFullYear(),
-  });
+  // For Hackathon prototype, we just generate a simple ID if not provided
+  const complaintId = payload.complaintId || `RW-${Math.floor(Math.random() * 1000000)}`;
 
   const complaint = {
-    id: complaints.length + 1,
-    complaintId,
-    userId: payload.userId || null,
-    roadCode: payload.roadCode || null,
-    roadName: payload.roadName || null,
-    roadType: payload.roadType || null,
+    complaint_id: complaintId,
+    user_id: payload.userId || null,
+    road_code: payload.roadCode || null,
+    road_name: payload.roadName || null,
+    road_type: payload.roadType || null,
     authority: payload.authority || null,
-    assignedAuthority,
-    engineerAssigned,
+    assigned_authority: payload.assignedAuthority || payload.authority || "District PWD",
+    engineer_assigned: payload.engineerAssigned || "Executive Engineer (Roads)",
     district: payload.district || null,
     state: payload.state || null,
-    lat: payload.lat,
-    lng: payload.lng,
-    issueType: payload.issueType,
+    latitude: payload.lat,
+    longitude: payload.lng,
+    issue_type: payload.issueType,
     description: payload.description || null,
-    summary: payload.summary || null,
     severity: payload.severity || null,
     priority: payload.priority || null,
-    riskScore: payload.riskScore || null,
-    mediaUrl: payload.mediaUrl || null,
-    media: payload.media || null,
-    status,
-    progressPercent,
-    estimatedCompletion,
-    timeline,
-    satisfactionRating: payload.satisfactionRating || null,
-    completionMedia: payload.completionMedia || null,
-    createdAt: createdAt.toISOString(),
-    submittedAt: createdAt.toISOString(),
+    risk_score: payload.riskScore || null,
+    image_url: payload.media?.imageUrl || payload.mediaUrl || null,
+    video_url: payload.media?.videoUrl || null,
+    status: payload.status || "Submitted",
+    progress_percent: typeof payload.progressPercent === "number" ? payload.progressPercent : deriveProgressPercent(payload.status || "Submitted"),
+    estimated_completion: payload.estimatedCompletion || addDays(new Date(), 14).toISOString(),
   };
 
-  complaints.push(complaint);
-  persistStore();
-  return complaint;
+  const { data, error } = await supabase
+    .from("complaints")
+    .insert([complaint])
+    .select()
+    .single();
+
+  if (error) {
+    logger.error("Failed to insert complaint to Supabase", error);
+    throw error;
+  }
+
+  return mapSupabaseToFrontend(data);
 };
 
-const listComplaints = () => complaints.slice();
+const listComplaints = async () => {
+  if (!supabase) return [];
+  const { data, error } = await supabase
+    .from("complaints")
+    .select("*")
+    .order("created_at", { ascending: false });
 
-const getComplaintById = (id) => {
-  if (!id) return null;
-  const normalized = String(id).trim();
-  const numeric = Number(normalized);
-  return (
-    complaints.find((complaint) => complaint.complaintId === normalized) ||
-    (Number.isFinite(numeric) ? complaints.find((complaint) => complaint.id === numeric) : null)
-  );
+  if (error) {
+    logger.error("Failed to fetch complaints", error);
+    return [];
+  }
+  return data.map(mapSupabaseToFrontend);
 };
 
-const listComplaintsByUser = (userId) => {
-  if (!userId) return [];
-  const normalized = String(userId);
-  return complaints.filter((complaint) => String(complaint.userId || "") === normalized);
+const getComplaintById = async (id) => {
+  if (!supabase || !id) return null;
+  const { data, error } = await supabase
+    .from("complaints")
+    .select("*")
+    .eq("complaint_id", id)
+    .single();
+
+  if (error) {
+    return null;
+  }
+  return mapSupabaseToFrontend(data);
 };
 
-loadStore();
+const listComplaintsByUser = async (userId) => {
+  if (!supabase || !userId) return [];
+  const { data, error } = await supabase
+    .from("complaints")
+    .select("*")
+    .eq("user_id", userId)
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    logger.error("Failed to fetch user complaints", error);
+    return [];
+  }
+  return data.map(mapSupabaseToFrontend);
+};
+
+// Map snake_case from DB to camelCase expected by frontend
+const mapSupabaseToFrontend = (row) => {
+  if (!row) return null;
+  return {
+    id: row.id,
+    complaintId: row.complaint_id,
+    userId: row.user_id,
+    roadCode: row.road_code,
+    roadName: row.road_name,
+    roadType: row.road_type,
+    authority: row.authority,
+    assignedAuthority: row.assigned_authority,
+    engineerAssigned: row.engineer_assigned,
+    district: row.district,
+    state: row.state,
+    lat: row.latitude,
+    lng: row.longitude,
+    issueType: row.issue_type,
+    description: row.description,
+    severity: row.severity,
+    priority: row.priority,
+    riskScore: row.risk_score,
+    mediaUrl: row.image_url || row.video_url,
+    media: {
+      imageUrl: row.image_url,
+      videoUrl: row.video_url,
+    },
+    status: row.status,
+    progressPercent: row.progress_percent,
+    estimatedCompletion: row.estimated_completion,
+    createdAt: row.created_at,
+    submittedAt: row.submitted_at || row.created_at,
+    timeline: buildTimeline(row.status || "Submitted", row.created_at || new Date(), row.assigned_authority),
+  };
+};
 
 module.exports = {
   createComplaint,

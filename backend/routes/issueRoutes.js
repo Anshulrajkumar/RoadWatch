@@ -7,24 +7,11 @@ const crypto = require("crypto");
 const multer = require("multer");
 
 const { reportIssue, rewriteDescription, listComplaintHistory } = require("../controllers/issueController");
+const { optionalAuth } = require("../middleware/authMiddleware");
 
 const router = express.Router();
 
-const uploadDir = process.env.VERCEL
-  ? path.join("/tmp", "uploads", "issues")
-  : path.join(__dirname, "..", "uploads", "issues");
-
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    fs.mkdirSync(uploadDir, { recursive: true });
-    cb(null, uploadDir);
-  },
-  filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname || "");
-    const name = `${Date.now()}-${crypto.randomBytes(6).toString("hex")}${ext}`;
-    cb(null, name);
-  },
-});
+const storage = multer.memoryStorage();
 
 const allowedTypes = new Set(["image/jpeg", "image/png", "image/jpg", "video/mp4"]);
 
@@ -52,6 +39,7 @@ router.get("/history", listComplaintHistory);
 
 router.post(
   "/report",
+  optionalAuth,
   upload.fields([
     { name: "image", maxCount: 1 },
     { name: "video", maxCount: 1 },

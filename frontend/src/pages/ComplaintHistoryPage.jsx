@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { FiFilter, FiRefreshCw, FiSearch } from "react-icons/fi";
-import { getComplaints } from "../services/api";
+import { useAuth } from "../contexts/AuthContext.jsx";
+import { getMyComplaints } from "../services/api";
 import ComplaintCard from "../components/ComplaintCard.jsx";
 import ComplaintDetailPanel from "../components/ComplaintDetailPanel.jsx";
 import StatusBadge from "../components/StatusBadge.jsx";
@@ -24,7 +25,15 @@ const severityRank = {
   Low: 1,
 };
 
+const StatCard = ({ label, value, accent }) => (
+  <div className={`rounded-xl border px-5 py-4 text-center ${accent ? "border-accent/30 bg-accent/5" : "border-border bg-white"}`}>
+    <p className="text-xs uppercase tracking-[0.14em] text-ink/50">{label}</p>
+    <p className={`mt-1 text-2xl font-semibold ${accent ? "text-accent" : "text-ink"}`}>{value}</p>
+  </div>
+);
+
 const ComplaintHistoryPage = () => {
+  const { user } = useAuth();
   const [complaints, setComplaints] = useState([]);
   const [selected, setSelected] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -42,18 +51,35 @@ const ComplaintHistoryPage = () => {
     setError(null);
 
     try {
-      const response = await getComplaints();
+      const response = await getMyComplaints();
       setComplaints(response?.complaints || []);
       setLoading(false);
     } catch (err) {
-      setError(err?.message || "Unable to load complaints.");
+      setError(err?.response?.data?.message || err?.message || "Unable to load complaints.");
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchComplaints();
-  }, []);
+    if (user) {
+      fetchComplaints();
+    }
+  }, [user]);
+
+  // --- Dashboard statistics (dynamic from user's complaints) ---
+  const stats = useMemo(() => {
+    const total = complaints.length;
+    const pending = complaints.filter(
+      (c) => (c.status || "Submitted") === "Submitted"
+    ).length;
+    const inProgress = complaints.filter((c) =>
+      ["In Progress", "Work In Progress", "Assigned", "Approved"].includes(c.status || "")
+    ).length;
+    const resolved = complaints.filter(
+      (c) => (c.status || "") === "Completed"
+    ).length;
+    return { total, pending, inProgress, resolved };
+  }, [complaints]);
 
   const districtOptions = useMemo(() => {
     const set = new Set(complaints.map((item) => item.district).filter(Boolean));
@@ -148,21 +174,29 @@ const ComplaintHistoryPage = () => {
 
   return (
     <div className="space-y-6">
+      {/* --- Dashboard Statistics --- */}
       <div className="rounded-xl border border-border bg-navy text-white shadow-card">
         <div className="border-l-4 border-accent px-6 py-6">
-          <p className="small-caps text-white/70">Public Transparency Center</p>
+          <p className="small-caps text-white/70">My Dashboard</p>
           <h2 className="mt-2 font-serif text-2xl">Complaint History and Tracking</h2>
           <p className="mt-2 text-sm text-white/70">
-            Monitor complaint lifecycle, authority actions, and repair progress across RoadWatch.
+            Monitor your complaints, track resolution progress, and review status updates.
           </p>
         </div>
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <StatCard label="Total Complaints" value={stats.total} accent />
+        <StatCard label="Pending" value={stats.pending} />
+        <StatCard label="In Progress" value={stats.inProgress} />
+        <StatCard label="Resolved" value={stats.resolved} />
       </div>
 
       <div className="grid gap-6 xl:grid-cols-[260px_minmax(0,1fr)_360px]">
         <aside className="flex flex-col gap-6 rounded-xl border border-border bg-white/80 p-6 shadow-card">
           <div>
             <p className="small-caps text-ink/60">Navigation</p>
-            <h3 className="mt-2 font-serif text-xl">Complaint Tracking</h3>
+            <h3 className="mt-2 font-serif text-xl">My Complaints</h3>
           </div>
 
           <nav className="space-y-2 text-sm text-ink/70">
@@ -261,7 +295,7 @@ const ComplaintHistoryPage = () => {
         <section className="space-y-4">
           <div className="rounded-xl border border-border bg-white shadow-card">
             <div className="border-b border-border bg-navy px-6 py-3 text-xs uppercase tracking-[0.14em] text-white/80">
-              Complaint Registry
+              My Complaint Registry
             </div>
             <div className="flex flex-wrap items-center justify-between gap-4 px-6 py-4 text-sm text-ink/70">
               <div>
@@ -305,7 +339,7 @@ const ComplaintHistoryPage = () => {
             </div>
           ) : (
             <div className="rounded-xl border border-border bg-white px-4 py-4 text-sm text-ink/60">
-              No complaints match the selected filters.
+              No complaints found. Start by reporting a road issue.
             </div>
           )}
         </section>
