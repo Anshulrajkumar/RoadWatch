@@ -27,7 +27,7 @@ const Dashboard = ({ onNavigate }) => {
               onClick={() => onNavigate?.("/report")}
               className="mx-auto block w-full rounded-xl bg-[#b91c1c] px-8 py-3 text-center text-sm font-semibold uppercase tracking-[0.14em] text-white shadow-soft transition hover:bg-[#991b1b]"
             >
-              Report an Issue ⚠️
+              Report an Issue
             </button>
           </div>
         </div>

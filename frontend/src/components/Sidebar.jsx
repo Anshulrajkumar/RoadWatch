@@ -163,7 +163,7 @@ const Sidebar = ({ onUseLocation, onSubmitRoadName, onSubmitCoords, loading, coo
         href="#/report"
         className="hidden w-full rounded-lg bg-[#b91c1c] px-6 py-4 text-center text-sm font-semibold uppercase tracking-[0.12em] text-white shadow-soft transition hover:bg-[#991b1b] xl:block"
       >
-        Report an Issue ⚠️
+        Report an Issue
       </a>
     </div>
   );

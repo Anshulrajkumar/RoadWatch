@@ -59,7 +59,7 @@ const UploadPreview = ({ preview, coords, road, submitting }) => {
       <button
         type="submit"
         form="report-issue-form"
-        className="w-full rounded-md bg-accent px-4 py-4 text-sm font-semibold uppercase tracking-[0.12em] text-white shadow-soft transition hover:bg-accent-soft"
+        className="w-full rounded-md bg-[#b91c1c] px-4 py-4 text-sm font-semibold uppercase tracking-[0.12em] text-white shadow-soft transition hover:bg-[#991b1b]"
         disabled={submitting}
       >
         {submitting ? "Submitting Complaint..." : "Submit Complaint"}

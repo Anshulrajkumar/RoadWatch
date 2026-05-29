@@ -164,7 +164,7 @@ const RoadDetailsPanel = ({ roadData, loading, lastUpdated }) => {
         href="#/report"
         className="w-full rounded-lg bg-[#b91c1c] px-6 py-4 text-center text-sm font-semibold uppercase tracking-[0.12em] text-white shadow-soft transition hover:bg-[#991b1b] xl:hidden"
       >
-        Report an Issue ⚠️
+        Report an Issue
       </a>
 
       {project.summary && (
