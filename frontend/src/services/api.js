@@ -1,4 +1,5 @@
 import axios from "axios";
+import { supabase } from "../lib/supabase.js";
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || "",
@@ -6,6 +7,15 @@ const api = axios.create({
   headers: {
     Accept: "application/json",
   },
+});
+
+// Attach Supabase JWT to every outgoing request when a session exists
+api.interceptors.request.use(async (config) => {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (session?.access_token) {
+    config.headers.Authorization = `Bearer ${session.access_token}`;
+  }
+  return config;
 });
 
 export const getNearestRoad = async (lat, lng) => {
@@ -61,6 +71,15 @@ export const getComplaintById = async (id) => {
 
 export const getComplaintHistoryByUser = async (userId) => {
   const response = await api.get(`/api/complaints/history/${userId}`);
+  return response.data;
+};
+
+/**
+ * Fetch only the authenticated user's complaints.
+ * The backend verifies the JWT and returns complaints where user_id matches.
+ */
+export const getMyComplaints = async () => {
+  const response = await api.get("/api/my-complaints");
   return response.data;
 };
 

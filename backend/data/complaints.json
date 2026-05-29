@@ -323,9 +323,160 @@
       "completionMedia": null,
       "createdAt": "2026-05-28T12:26:40.092Z",
       "submittedAt": "2026-05-28T12:26:40.092Z"
+    },
+    {
+      "id": 6,
+      "complaintId": "RW-RD-BAG-2026-006",
+      "userId": "20278624-eb21-4aed-b404-bb2d3ff8fc8c",
+      "roadCode": null,
+      "roadName": "Sālānpur",
+      "roadType": "Unknown",
+      "authority": "Unknown",
+      "assignedAuthority": "Unknown",
+      "engineerAssigned": "Executive Engineer (Roads)",
+      "district": "Baghmara-Cum-Katras",
+      "state": "Jharkhand",
+      "lat": 23.816743,
+      "lng": 86.291,
+      "issueType": "Pothole",
+      "description": "A pothole has been reported on the road. The defect is a pothole. Further investigation is required to determine its exact location and severity.",
+      "summary": "A pothole has been reported on the road. The defect is a pothole. Further investigation is required to determine its exact location and seve",
+      "severity": "High",
+      "priority": "Immediate",
+      "riskScore": 84,
+      "mediaUrl": "http://localhost:4000/uploads/issues/1780047075183-3f2d84ac3606.jpg",
+      "media": {
+        "imageUrl": "http://localhost:4000/uploads/issues/1780047075183-3f2d84ac3606.jpg",
+        "videoUrl": null
+      },
+      "status": "Submitted",
+      "progressPercent": 20,
+      "estimatedCompletion": "2026-06-12",
+      "timeline": [
+        {
+          "stage": "Complaint Submitted",
+          "completed": true,
+          "current": true,
+          "timestamp": "2026-05-29T09:31:16.693Z",
+          "actor": "Citizen Portal",
+          "note": null
+        },
+        {
+          "stage": "Complaint Approved",
+          "completed": false,
+          "current": false,
+          "timestamp": null,
+          "actor": "Executive Engineer",
+          "note": null
+        },
+        {
+          "stage": "Assigned to Local Authority",
+          "completed": false,
+          "current": false,
+          "timestamp": null,
+          "actor": "District Control Room",
+          "note": "Assigned to Unknown."
+        },
+        {
+          "stage": "Work In Progress",
+          "completed": false,
+          "current": false,
+          "timestamp": null,
+          "actor": "PWD Division",
+          "note": "Work order issued and site mobilization started."
+        },
+        {
+          "stage": "Work Completed",
+          "completed": false,
+          "current": false,
+          "timestamp": null,
+          "actor": "Quality Audit Cell",
+          "note": null
+        }
+      ],
+      "satisfactionRating": null,
+      "completionMedia": null,
+      "createdAt": "2026-05-29T09:31:16.693Z",
+      "submittedAt": "2026-05-29T09:31:16.693Z"
+    },
+    {
+      "id": 7,
+      "complaintId": "RW-RD-NAU-2026-001",
+      "userId": "677fb77e-0f1f-48a8-a8e2-ca1d20658aa7",
+      "roadCode": null,
+      "roadName": "Dehri - Nauhatta - Yadunathpur Road",
+      "roadType": "Unknown",
+      "authority": "Unknown",
+      "assignedAuthority": "Unknown",
+      "engineerAssigned": "Executive Engineer (Roads)",
+      "district": "Nauhatta",
+      "state": "Bihar",
+      "lat": 24.5955,
+      "lng": 83.9147,
+      "issueType": "Crack",
+      "description": "Complaint of a visible crack in the road surface. Location of the crack is not specified. Requesting immediate attention for repair.",
+      "summary": "Complaint of a visible crack in the road surface. Location of the crack is not specified. Requesting immediate attention for repair.",
+      "severity": "Medium",
+      "priority": "Priority",
+      "riskScore": 58,
+      "mediaUrl": "http://localhost:4000/uploads/issues/1780047813457-59f04415b0a0.jpg",
+      "media": {
+        "imageUrl": "http://localhost:4000/uploads/issues/1780047813457-59f04415b0a0.jpg",
+        "videoUrl": null
+      },
+      "status": "Submitted",
+      "progressPercent": 20,
+      "estimatedCompletion": "2026-06-12",
+      "timeline": [
+        {
+          "stage": "Complaint Submitted",
+          "completed": true,
+          "current": true,
+          "timestamp": "2026-05-29T09:43:35.377Z",
+          "actor": "Citizen Portal",
+          "note": null
+        },
+        {
+          "stage": "Complaint Approved",
+          "completed": false,
+          "current": false,
+          "timestamp": null,
+          "actor": "Executive Engineer",
+          "note": null
+        },
+        {
+          "stage": "Assigned to Local Authority",
+          "completed": false,
+          "current": false,
+          "timestamp": null,
+          "actor": "District Control Room",
+          "note": "Assigned to Unknown."
+        },
+        {
+          "stage": "Work In Progress",
+          "completed": false,
+          "current": false,
+          "timestamp": null,
+          "actor": "PWD Division",
+          "note": "Work order issued and site mobilization started."
+        },
+        {
+          "stage": "Work Completed",
+          "completed": false,
+          "current": false,
+          "timestamp": null,
+          "actor": "Quality Audit Cell",
+          "note": null
+        }
+      ],
+      "satisfactionRating": null,
+      "completionMedia": null,
+      "createdAt": "2026-05-29T09:43:35.377Z",
+      "submittedAt": "2026-05-29T09:43:35.377Z"
     }
   ],
   "counters": {
-    "RD-BAG-2026": 5
+    "RD-BAG-2026": 6,
+    "RD-NAU-2026": 1
   }
 }

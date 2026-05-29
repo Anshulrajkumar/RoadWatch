@@ -44,7 +44,8 @@ const listAllComplaints = async (req, res, next) => {
     const parsedLimit = Number.parseInt(req.query.limit, 10);
     const limit = Number.isFinite(parsedLimit) && parsedLimit > 0 ? parsedLimit : null;
 
-    const all = listComplaints()
+    const allData = await listComplaints();
+    const all = allData
       .map(hydrateComplaint)
       .sort((a, b) => new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime());
 
@@ -62,7 +63,7 @@ const listAllComplaints = async (req, res, next) => {
 
 const getComplaint = async (req, res, next) => {
   try {
-    const complaint = getComplaintById(req.params.id);
+    const complaint = await getComplaintById(req.params.id);
     if (!complaint) {
       return res.status(404).json({
         success: false,
@@ -82,7 +83,8 @@ const getComplaint = async (req, res, next) => {
 const listComplaintHistoryByUser = async (req, res, next) => {
   try {
     const userId = String(req.params.userId || "").trim();
-    const all = listComplaintsByUser(userId)
+    const allData = await listComplaintsByUser(userId);
+    const all = allData
       .map(hydrateComplaint)
       .sort((a, b) => new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime());
 

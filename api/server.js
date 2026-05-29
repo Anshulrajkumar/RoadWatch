@@ -25,6 +25,27 @@ app.use("/api/issues", issueRoutes);
 app.use("/api/complaints", complaintRoutes);
 app.use("/api/chatbot", chatbotRoutes);
 
+const { authMiddleware } = require("../backend/middleware/authMiddleware");
+const { listComplaintsByUser } = require("../backend/services/complaintStore");
+
+app.get("/api/my-complaints", authMiddleware, async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+    const complaintsData = await listComplaintsByUser(userId);
+    const complaints = complaintsData
+      .sort((a, b) => new Date(b.submittedAt || b.createdAt).getTime() - new Date(a.submittedAt || a.createdAt).getTime());
+
+    return res.json({
+      success: true,
+      total: complaints.length,
+      userId,
+      complaints,
+    });
+  } catch (error) {
+    return next(error);
+  }
+});
+
 app.use((req, res) => {
   res.status(404).json({ error: "Not found" });
 });

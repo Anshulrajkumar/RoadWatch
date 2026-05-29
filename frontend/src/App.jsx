@@ -4,7 +4,11 @@ import Dashboard from "./pages/Dashboard.jsx";
 import ReportIssue from "./pages/ReportIssue.jsx";
 import ComplaintHistoryPage from "./pages/ComplaintHistoryPage.jsx";
 import LandingPage from "./pages/LandingPage.jsx";
+import LoginPage from "./pages/LoginPage.jsx";
+import RegisterPage from "./pages/RegisterPage.jsx";
+import ProfilePage from "./pages/ProfilePage.jsx";
 import ChatbotWidget from "./components/chatbot/ChatbotWidget.jsx";
+import ProtectedRoute from "./components/ProtectedRoute.jsx";
 
 
 const App = () => {
@@ -42,7 +46,9 @@ const App = () => {
   const activePage = (() => {
     const { pathname, hash } = location;
 
-
+    if (pathname === "/login") return "login";
+    if (pathname === "/register") return "register";
+    if (pathname === "/profile") return "profile";
 
     if (pathname === "/map" || pathname === "/dashboard") {
       return pathname === "/map" ? "search" : "dashboard";
@@ -71,7 +77,47 @@ const App = () => {
     return "home";
   })();
 
+  // --- Login page ---
+  if (location.pathname === "/login") {
+    return (
+      <>
+        <LoginPage
+          activePage={activePage}
+          onNavigate={navigate}
+          onBrandClick={() => navigate("/")}
+        />
+        <ChatbotWidget currentPage={location.pathname} />
+      </>
+    );
+  }
 
+  // --- Register page ---
+  if (location.pathname === "/register") {
+    return (
+      <>
+        <RegisterPage
+          activePage={activePage}
+          onNavigate={navigate}
+          onBrandClick={() => navigate("/")}
+        />
+        <ChatbotWidget currentPage={location.pathname} />
+      </>
+    );
+  }
+
+  // --- Profile page (protected) ---
+  if (location.pathname === "/profile") {
+    return (
+      <ProtectedRoute onNavigate={navigate}>
+        <ProfilePage
+          activePage={activePage}
+          onNavigate={navigate}
+          onBrandClick={() => navigate("/")}
+        />
+        <ChatbotWidget currentPage={location.pathname} />
+      </ProtectedRoute>
+    );
+  }
 
   // --- Dashboard pages (map search / road tracking) ---
   if (location.pathname === "/map") {
@@ -97,15 +143,15 @@ const App = () => {
     );
   }
 
-  // --- Complaint History / Tracking page ---
+  // --- Complaint History / Tracking page (protected) ---
   if (location.pathname === "/complaints" || location.pathname === "/dashboard") {
     return (
-      <>
+      <ProtectedRoute onNavigate={navigate}>
         <DashboardLayout activePage={activePage} onNavigate={navigate} onBrandClick={() => navigate("/")}>
           <ComplaintHistoryPage />
         </DashboardLayout>
         <ChatbotWidget currentPage={location.pathname} />
-      </>
+      </ProtectedRoute>
     );
   }
 

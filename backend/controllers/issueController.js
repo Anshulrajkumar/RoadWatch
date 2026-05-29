@@ -5,6 +5,7 @@ const { extractRoad, normalizeRoadCode } = require("../utils/extractRoad");
 const { classifyRoad } = require("../utils/classifyRoad");
 const { generateIssueInsights, rewriteIssueDescription } = require("../services/geminiService");
 const { createComplaint, listComplaints } = require("../services/complaintStore");
+const { uploadToSupabaseStorage } = require("../services/storageService");
 
 const getBodyValue = (body, ...keys) => {
   for (const key of keys) {
@@ -57,7 +58,8 @@ const reportIssue = async (req, res, next) => {
   try {
     const issueType = String(getBodyValue(req.body, "issueType", "issue_type") || "").trim();
     const description = String(getBodyValue(req.body, "description") || "").trim();
-    const userId = getBodyValue(req.body, "userId", "user_id", "citizenId", "citizen_id");
+    // Prefer user ID from authenticated JWT, fall back to request body
+    const userId = req.user?.id || getBodyValue(req.body, "userId", "user_id", "citizenId", "citizen_id");
     const lat = Number.parseFloat(getBodyValue(req.body, "latitude", "lat"));
     const lng = Number.parseFloat(getBodyValue(req.body, "longitude", "lng"));
 
@@ -94,9 +96,15 @@ const reportIssue = async (req, res, next) => {
 
     road = normalizeRoad(road);
 
-    const baseUrl = `${req.protocol}://${req.get("host")}`;
-    const imageUrl = imageFile ? `${baseUrl}/uploads/issues/${imageFile.filename}` : null;
-    const videoUrl = videoFile ? `${baseUrl}/uploads/issues/${videoFile.filename}` : null;
+    let imageUrl = null;
+    if (imageFile) {
+      imageUrl = await uploadToSupabaseStorage(imageFile);
+    }
+
+    let videoUrl = null;
+    if (videoFile) {
+      videoUrl = await uploadToSupabaseStorage(videoFile);
+    }
 
     const aiResult = await generateIssueInsights({
       issueType,
@@ -105,7 +113,7 @@ const reportIssue = async (req, res, next) => {
       coordinates: { lat, lng },
     });
 
-    const complaint = createComplaint({
+    const complaint = await createComplaint({
       userId,
       roadCode: road.roadCode,
       roadName: road.roadName,
@@ -173,7 +181,8 @@ const listComplaintHistory = async (req, res, next) => {
     const parsedLimit = Number.parseInt(req.query.limit, 10);
     const limit = Number.isFinite(parsedLimit) && parsedLimit > 0 ? parsedLimit : null;
 
-    const all = listComplaints().sort(
+    const allData = await listComplaints();
+    const all = allData.sort(
       (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
     const complaints = limit ? all.slice(0, limit) : all;

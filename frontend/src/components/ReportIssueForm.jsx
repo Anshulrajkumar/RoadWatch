@@ -5,6 +5,7 @@ import LocationFetcher from "./LocationFetcher.jsx";
 import { getNearestRoad, reportIssue, rewriteIssueDescription } from "../services/api";
 import { useGeolocation } from "../hooks/useGeolocation";
 import { compressImage } from "../utils/compressImage";
+import { useAuth } from "../contexts/AuthContext.jsx";
 
 const ISSUE_TYPES = [
   "Pothole",
@@ -37,6 +38,7 @@ const ReportIssueForm = ({
   onComplaint,
   onStatusChange,
 }) => {
+  const { user } = useAuth();
   const draft = readDraft();
   const { getCurrentLocation } = useGeolocation();
   const [imageFile, setImageFile] = useState(null);
@@ -237,6 +239,11 @@ const ReportIssueForm = ({
       formData.append("description", values.description || "");
       formData.append("latitude", values.latitude);
       formData.append("longitude", values.longitude);
+
+      // Attach authenticated user ID
+      if (user?.id) {
+        formData.append("userId", user.id);
+      }
 
       if (roadInfo) {
         if (roadInfo.roadCode) formData.append("roadCode", roadInfo.roadCode);

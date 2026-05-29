@@ -1,37 +1,19 @@
 import { useState } from "react";
+import { useAuth } from "../contexts/AuthContext.jsx";
 import Header from "../components/Header.jsx";
 import Footer from "../components/Footer.jsx";
 
-const LoginPage = ({ onBack, activePage, onNavigate, onBrandClick }) => {
-  const [activeTab, setActiveTab] = useState("mobile");
-  const [mobileNumber, setMobileNumber] = useState("");
+const LoginPage = ({ activePage, onNavigate, onBrandClick }) => {
+  const { signIn, signInWithGoogle } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
+  const [generalError, setGeneralError] = useState(null);
 
-  const tabItems = [
-    { id: "mobile", label: "Mobile & OTP" },
-    { id: "email", label: "Email Login" },
-  ];
-
-  const validateMobile = (value) => /^\d{10}$/.test(value);
   const validateEmail = (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 
-  const handleOtpRequest = () => {
-    const nextErrors = {};
-
-    if (!validateMobile(mobileNumber)) {
-      nextErrors.mobileNumber = "Enter a valid 10-digit mobile number.";
-    }
-
-    setErrors(nextErrors);
-
-    if (Object.keys(nextErrors).length === 0) {
-      setErrors({});
-    }
-  };
-
-  const handleEmailContinue = () => {
+  const handleEmailLogin = async () => {
     const nextErrors = {};
 
     if (!validateEmail(email)) {
@@ -43,9 +25,34 @@ const LoginPage = ({ onBack, activePage, onNavigate, onBrandClick }) => {
     }
 
     setErrors(nextErrors);
+    if (Object.keys(nextErrors).length > 0) return;
 
-    if (Object.keys(nextErrors).length === 0) {
-      setErrors({});
+    setLoading(true);
+    setGeneralError(null);
+
+    try {
+      await signIn(email, password);
+      onNavigate?.("/dashboard");
+    } catch (error) {
+      setGeneralError(error?.message || "Login failed. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleLogin = async () => {
+    setGeneralError(null);
+    try {
+      await signInWithGoogle();
+    } catch (error) {
+      setGeneralError(error?.message || "Google login failed.");
+    }
+  };
+
+  const handleKeyDown = (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      handleEmailLogin();
     }
   };
 
@@ -64,112 +71,64 @@ const LoginPage = ({ onBack, activePage, onNavigate, onBrandClick }) => {
             </div>
 
             <div className="px-5 py-6 sm:px-8 sm:py-8">
-              <div className="grid grid-cols-2 gap-3 border-b border-border pb-5 text-center sm:gap-4">
-                {tabItems.map((item) => (
-                  <button
-                    key={item.id}
-                    type="button"
-                    onClick={() => setActiveTab(item.id)}
-                    className={`rounded-xl border px-3 py-3.5 text-sm font-semibold transition sm:px-4 sm:py-4 sm:text-base ${
-                      activeTab === item.id
-                        ? "border-navy bg-[#eef3fb] text-navy shadow-[0_2px_8px_rgba(15,35,72,0.08)]"
-                        : "border-border bg-white text-ink/62 hover:border-[#c7cfda] hover:text-ink"
-                    }`}
-                  >
-                    {item.label}
-                  </button>
-                ))}
-              </div>
+              {generalError && (
+                <div className="mb-5 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                  {generalError}
+                </div>
+              )}
 
-              <div className="mt-8">
-                {activeTab === "mobile" ? (
-                  <div className="mx-auto w-full max-w-[560px] space-y-5">
-                    <div className="space-y-2">
-                      <label className="block text-sm font-semibold tracking-tight text-ink sm:text-[0.98rem]">
-                        10-Digit Mobile Number
-                      </label>
-                      <div className="flex w-full items-stretch overflow-hidden rounded-lg border border-[#8a919d] bg-white focus-within:border-navy">
-                        <span className="flex items-center border-r border-[#d4d8df] bg-white px-4 py-3.5 text-base text-ink/70 sm:py-4">
-                          +91
-                        </span>
-                        <input
-                          type="tel"
-                          inputMode="numeric"
-                          placeholder="Enter your mobile number"
-                          value={mobileNumber}
-                          onChange={(event) => {
-                            const nextValue = event.target.value.replace(/\D/g, "").slice(0, 10);
-                            setMobileNumber(nextValue);
+              <div className="mx-auto w-full max-w-[560px] space-y-5">
+                <div className="space-y-2">
+                  <label className="block text-sm font-semibold tracking-tight text-ink sm:text-[0.98rem]">
+                    Email Address
+                  </label>
+                  <input
+                    id="login-email"
+                    type="email"
+                    placeholder="you@example.com"
+                    value={email}
+                    onKeyDown={handleKeyDown}
+                    onChange={(event) => {
+                      setEmail(event.target.value);
+                      if (errors.email) {
+                        setErrors((prev) => ({ ...prev, email: undefined }));
+                      }
+                    }}
+                    className="w-full rounded-lg border border-[#8a919d] bg-white px-4 py-4 text-base text-ink outline-none placeholder:text-ink/38 focus:border-navy"
+                  />
+                  {errors.email && <p className="text-sm text-red-600">{errors.email}</p>}
+                </div>
 
-                            if (errors.mobileNumber) {
-                              setErrors((currentErrors) => ({ ...currentErrors, mobileNumber: undefined }));
-                            }
-                          }}
-                          className="min-w-0 flex-1 bg-white px-4 py-3.75 text-base text-ink outline-none placeholder:text-ink/38 sm:py-4"
-                        />
-                      </div>
-                      {errors.mobileNumber ? <p className="text-sm text-red-600">{errors.mobileNumber}</p> : null}
-                    </div>
+                <div className="space-y-2">
+                  <label className="block text-sm font-semibold tracking-tight text-ink sm:text-[0.98rem]">
+                    Password
+                  </label>
+                  <input
+                    id="login-password"
+                    type="password"
+                    placeholder="Enter password"
+                    value={password}
+                    onKeyDown={handleKeyDown}
+                    onChange={(event) => {
+                      setPassword(event.target.value);
+                      if (errors.password) {
+                        setErrors((prev) => ({ ...prev, password: undefined }));
+                      }
+                    }}
+                    className="w-full rounded-lg border border-[#8a919d] bg-white px-4 py-4 text-base text-ink outline-none placeholder:text-ink/38 focus:border-navy"
+                  />
+                  {errors.password && <p className="text-sm text-red-600">{errors.password}</p>}
+                </div>
 
-                    <button
-                      type="button"
-                      onClick={handleOtpRequest}
-                      className="w-full rounded-lg bg-accent px-4 py-4 text-sm font-semibold uppercase tracking-[0.16em] text-white transition hover:bg-[#f39a32]"
-                    >
-                      Request OTP
-                    </button>
-                  </div>
-                ) : (
-                  <div className="mx-auto w-full max-w-[560px] space-y-5">
-                    <div className="space-y-2">
-                      <label className="block text-sm font-semibold tracking-tight text-ink sm:text-[0.98rem]">
-                        Official Email
-                      </label>
-                      <input
-                        type="email"
-                        placeholder="official@department.gov.in"
-                        value={email}
-                        onChange={(event) => {
-                          setEmail(event.target.value);
-
-                          if (errors.email) {
-                            setErrors((currentErrors) => ({ ...currentErrors, email: undefined }));
-                          }
-                        }}
-                        className="w-full rounded-lg border border-[#8a919d] bg-white px-4 py-4 text-base text-ink outline-none placeholder:text-ink/38 focus:border-navy"
-                      />
-                      {errors.email ? <p className="text-sm text-red-600">{errors.email}</p> : null}
-                    </div>
-
-                    <div className="space-y-2">
-                      <label className="block text-sm font-semibold tracking-tight text-ink sm:text-[0.98rem]">
-                        Password
-                      </label>
-                      <input
-                        type="password"
-                        placeholder="Enter password"
-                        value={password}
-                        onChange={(event) => {
-                          setPassword(event.target.value);
-
-                          if (errors.password) {
-                            setErrors((currentErrors) => ({ ...currentErrors, password: undefined }));
-                          }
-                        }}
-                        className="w-full rounded-lg border border-[#8a919d] bg-white px-4 py-4 text-base text-ink outline-none placeholder:text-ink/38 focus:border-navy"
-                      />
-                      {errors.password ? <p className="text-sm text-red-600">{errors.password}</p> : null}
-                    </div>
-
-                    <button
-                      type="button"
-                      onClick={handleEmailContinue}
-                      className="w-full rounded-lg bg-accent px-4 py-4 text-sm font-semibold uppercase tracking-[0.16em] text-white transition hover:bg-[#f39a32]"
-                    >
-                      Continue
-                    </button>
-                  </div>
-                )}
+                <button
+                  id="login-submit"
+                  type="button"
+                  onClick={handleEmailLogin}
+                  disabled={loading}
+                  className="w-full rounded-lg bg-accent px-4 py-4 text-sm font-semibold uppercase tracking-[0.16em] text-white transition hover:bg-[#f39a32] disabled:opacity-60"
+                >
+                  {loading ? "Signing in..." : "Sign In"}
+                </button>
               </div>
 
               <div className="my-7 flex items-center gap-4 text-sm text-ink/56">
@@ -179,26 +138,47 @@ const LoginPage = ({ onBack, activePage, onNavigate, onBrandClick }) => {
               </div>
 
               <button
+                id="login-google"
                 type="button"
-                onClick={onBack}
+                onClick={handleGoogleLogin}
                 className="flex w-full items-center justify-center gap-3 rounded-lg border border-[#141b29] bg-white px-4 py-4 text-sm font-semibold uppercase tracking-[0.14em] text-[#0f1a2e] transition hover:bg-muted"
               >
-                <span className="inline-flex h-5 w-5 items-center justify-center rounded-sm border border-current text-[0.7rem] leading-none">
-                  ID
-                </span>
-                Department Login
+                <svg className="h-5 w-5" viewBox="0 0 24 24" aria-hidden="true">
+                  <path
+                    d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1Z"
+                    fill="#4285F4"
+                  />
+                  <path
+                    d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23Z"
+                    fill="#34A853"
+                  />
+                  <path
+                    d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62Z"
+                    fill="#FBBC05"
+                  />
+                  <path
+                    d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53Z"
+                    fill="#EA4335"
+                  />
+                </svg>
+                Continue with Google
               </button>
 
               <div className="mt-6 text-center text-sm text-ink/70 sm:text-base">
                 New to RoadWatch?{" "}
-                <button type="button" className="font-semibold text-[#a16006] transition hover:text-[#7f4a03]">
+                <button
+                  id="login-register-link"
+                  type="button"
+                  onClick={() => onNavigate?.("/register")}
+                  className="font-semibold text-[#a16006] transition hover:text-[#7f4a03]"
+                >
                   Register Here
                 </button>
               </div>
             </div>
 
             <div className="border-t border-border bg-[#eef3fb] px-6 py-4 text-center text-sm text-ink/70 sm:px-8">
-              Secure portal access
+              Secure portal access powered by Supabase
             </div>
           </section>
         </div>

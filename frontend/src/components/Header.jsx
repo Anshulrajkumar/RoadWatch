@@ -1,17 +1,46 @@
 import { useState } from "react";
-
-const navItems = [
-  { id: "home", label: "Home", href: "/" },
-  { id: "search", label: "Search", href: "/map" },
-  { id: "complaint", label: "Complain section", href: "/report" },
-  { id: "dashboard", label: "Dashboard", href: "/dashboard" },
-];
+import { useAuth } from "../contexts/AuthContext.jsx";
 
 const Header = ({ activePage, onNavigate, onBrandClick }) => {
+  const { user, loading, signOut } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
 
-  const handleNav = (item) => {
-    if (item.disabled) {
+  // Build dynamic nav items based on auth state
+  const navItems = (() => {
+    const base = [
+      { id: "home", label: "Home", href: "/" },
+      { id: "search", label: "Search", href: "/map" },
+      { id: "complaint", label: "Complain section", href: "/report" },
+    ];
+
+    if (loading) {
+      // While checking auth, show minimal nav
+      return [...base, { id: "login", label: "Login", href: "/login" }];
+    }
+
+    if (user) {
+      return [
+        ...base,
+        { id: "dashboard", label: "Dashboard", href: "/dashboard" },
+        { id: "profile", label: "Profile", href: "/profile" },
+        { id: "logout", label: "Logout", href: "#logout", action: "logout" },
+      ];
+    }
+
+    return [...base, { id: "login", label: "Login", href: "/login" }];
+  })();
+
+  const handleNav = async (item) => {
+    if (item.disabled) return;
+
+    if (item.action === "logout") {
+      try {
+        await signOut();
+        onNavigate?.("/");
+      } catch (error) {
+        console.error("Logout failed:", error);
+      }
+      setMenuOpen(false);
       return;
     }
 
@@ -39,6 +68,7 @@ const Header = ({ activePage, onNavigate, onBrandClick }) => {
         <nav className="hidden items-center gap-2 lg:flex">
           {navItems.map((item) => {
             const isActive = activePage === item.id;
+            const isLogout = item.action === "logout";
 
             return (
               <button
@@ -47,18 +77,29 @@ const Header = ({ activePage, onNavigate, onBrandClick }) => {
                 onClick={() => handleNav(item)}
                 disabled={item.disabled}
                 className={`relative inline-flex items-center rounded-full px-4 py-2 text-sm font-medium text-white transition duration-200 ${
-                  isActive ? "bg-white/10" : "hover:bg-white/6 hover:text-white hover:underline decoration-white/30 underline-offset-8"
+                  isLogout
+                    ? "bg-red-500/20 hover:bg-red-500/30 text-red-200 hover:text-white"
+                    : isActive ? "bg-white/10" : "hover:bg-white/6 hover:text-white hover:underline decoration-white/30 underline-offset-8"
                 } ${item.disabled ? "cursor-default opacity-70 hover:no-underline hover:bg-white/10" : ""}`}
               >
                 <span>{item.label}</span>
-                <span
-                  className={`absolute inset-x-4 -bottom-0.5 h-[2px] rounded-full bg-white transition-opacity duration-200 ${
-                    isActive ? "opacity-100" : "opacity-0"
-                  }`}
-                />
+                {!isLogout && (
+                  <span
+                    className={`absolute inset-x-4 -bottom-0.5 h-[2px] rounded-full bg-white transition-opacity duration-200 ${
+                      isActive ? "opacity-100" : "opacity-0"
+                    }`}
+                  />
+                )}
               </button>
             );
           })}
+
+          {/* User avatar indicator when logged in */}
+          {user && (
+            <div className="ml-2 grid h-8 w-8 place-items-center rounded-full bg-accent text-xs font-semibold text-white">
+              {(user.email || "U")[0].toUpperCase()}
+            </div>
+          )}
         </nav>
 
         <button
@@ -80,6 +121,7 @@ const Header = ({ activePage, onNavigate, onBrandClick }) => {
         <div className="mx-auto flex w-full max-w-7xl flex-col gap-2 px-4 py-3 sm:px-6">
           {navItems.map((item) => {
             const isActive = activePage === item.id;
+            const isLogout = item.action === "logout";
 
             return (
               <button
@@ -88,15 +130,19 @@ const Header = ({ activePage, onNavigate, onBrandClick }) => {
                 onClick={() => handleNav(item)}
                 disabled={item.disabled}
                 className={`relative flex items-center gap-2 rounded-2xl px-4 py-3 text-left text-sm font-medium text-white transition ${
-                  isActive ? "bg-white/10" : "hover:bg-white/6 hover:text-white"
+                  isLogout
+                    ? "bg-red-500/20 text-red-200 hover:bg-red-500/30"
+                    : isActive ? "bg-white/10" : "hover:bg-white/6 hover:text-white"
                 } ${item.disabled ? "cursor-default opacity-70 hover:bg-white/10" : ""}`}
               >
                 <span>{item.label}</span>
-                <span
-                  className={`absolute inset-x-4 -bottom-0.5 h-[2px] rounded-full bg-white transition-opacity duration-200 ${
-                    isActive ? "opacity-100" : "opacity-0"
-                  }`}
-                />
+                {!isLogout && (
+                  <span
+                    className={`absolute inset-x-4 -bottom-0.5 h-[2px] rounded-full bg-white transition-opacity duration-200 ${
+                      isActive ? "opacity-100" : "opacity-0"
+                    }`}
+                  />
+                )}
               </button>
             );
           })}
