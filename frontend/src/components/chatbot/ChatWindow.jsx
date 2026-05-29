@@ -96,9 +96,7 @@ const ChatWindow = ({ onClose, currentPage }) => {
       {/* Header */}
       <div className="flex items-center justify-between border-b border-white/10 bg-navy px-4 py-3">
         <div className="flex items-center gap-2.5">
-          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-accent text-xs font-bold text-navy">
-            RW
-          </div>
+          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-navy text-xs font-bold" />
           <div>
             <p className="text-sm font-semibold text-white">
               Road<span className="text-accent">Watch</span> Assistant
@@ -134,8 +132,9 @@ const ChatWindow = ({ onClose, currentPage }) => {
       <div ref={scrollRef} className="flex-1 overflow-y-auto py-3" style={{ scrollBehavior: "smooth" }}>
         {messages.length === 0 && !isTyping && (
           <div className="flex flex-col items-center justify-center px-6 py-8 text-center">
-            <div className="mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-accent/15 text-2xl font-bold text-accent">
-              RW
+            <div className="mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-white/10 text-2xl font-bold">
+              <span className="text-white">R</span>
+              <span className="text-accent">W</span>
             </div>
             <p className="text-sm font-semibold text-white">
               Hi! I'm your Road<span className="text-accent">Watch</span> assistant.
