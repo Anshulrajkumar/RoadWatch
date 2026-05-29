@@ -277,7 +277,7 @@ const ReportIssueForm = ({
   };
 
   return (
-    <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
+    <form id="report-issue-form" className="flex flex-col gap-6" onSubmit={handleSubmit(onSubmit)}>
       <IssueUploadCard
         imageName={imageFile?.name || null}
         videoName={videoFile?.name || null}
@@ -387,14 +387,6 @@ const ReportIssueForm = ({
           {status.error}
         </div>
       ) : null}
-
-      <button
-        type="submit"
-        className="w-full rounded-md bg-accent px-4 py-4 text-sm font-semibold uppercase tracking-[0.12em] text-white shadow-soft transition hover:bg-accent-soft"
-        disabled={status.submitting}
-      >
-        {status.submitting ? "Submitting Complaint..." : "Submit Complaint"}
-      </button>
     </form>
   );
 };

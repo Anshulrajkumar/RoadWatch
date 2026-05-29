@@ -15,6 +15,7 @@ const formatDate = (value) => {
 
 const ComplaintHistory = ({ complaints, loading, error, onRefresh }) => {
   const items = Array.isArray(complaints) ? complaints : [];
+  const visibleItems = items.slice(0, 3);
 
   return (
     <div className="rounded-xl border border-border bg-white shadow-card">
@@ -42,8 +43,8 @@ const ComplaintHistory = ({ complaints, loading, error, onRefresh }) => {
           <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-xs text-red-700">
             {error}
           </div>
-        ) : items.length ? (
-          items.map((complaint) => {
+        ) : visibleItems.length ? (
+          visibleItems.map((complaint) => {
             const summary = formatSummary(complaint.description);
             const complaintId = complaint.complaintId || `Complaint #${complaint.id}`;
             const roadLabel = complaint.roadName || complaint.roadCode;
@@ -71,6 +72,15 @@ const ComplaintHistory = ({ complaints, loading, error, onRefresh }) => {
             No complaints submitted yet.
           </div>
         )}
+
+        {items.length > 3 ? (
+          <a
+            href="#/dashboard"
+            className="block w-full rounded-md border border-navy px-4 py-3 text-center text-xs font-semibold uppercase tracking-[0.12em] text-navy transition hover:border-accent hover:text-accent"
+          >
+            View All Complaints
+          </a>
+        ) : null}
       </div>
     </div>
   );

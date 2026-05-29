@@ -29,9 +29,11 @@ const RoadDetailsPanel = ({ roadData, loading, lastUpdated }) => {
 
   return (
     <aside className="flex flex-col gap-6">
+      <p className="text-base font-semibold uppercase tracking-[0.18em] text-center text-ink/60">
+        Project Deatails
+      </p>
       <div className="rounded-xl border border-border bg-navy text-white shadow-card">
         <div className="border-l-4 border-accent px-6 py-6">
-          <p className="small-caps text-white/70">Project Detailed View</p>
           <h3 className="mt-2 font-serif text-2xl">{roadName}</h3>
           <p className="mt-2 text-sm text-white/70">
             Project ID: {project.projectId || `RW-${roadCode || "UN"}`}
@@ -158,6 +160,13 @@ const RoadDetailsPanel = ({ roadData, loading, lastUpdated }) => {
         </div>
       </div>
 
+      <a
+        href="#/report"
+        className="w-full rounded-lg bg-[#b91c1c] px-6 py-4 text-center text-sm font-semibold uppercase tracking-[0.12em] text-white shadow-soft transition hover:bg-[#991b1b] xl:hidden"
+      >
+        Report an Issue ⚠️
+      </a>
+
       {project.summary && (
         <div className="rounded-xl border border-border bg-white shadow-card">
           <div className="border-b border-border bg-navy px-6 py-3 text-xs uppercase tracking-[0.14em] text-white/80">
@@ -169,12 +178,6 @@ const RoadDetailsPanel = ({ roadData, loading, lastUpdated }) => {
         </div>
       )}
 
-      <a
-        href="#/report"
-        className="rounded-lg bg-[#b91c1c] px-6 py-4 text-center text-sm font-semibold uppercase tracking-[0.12em] text-white shadow-soft transition hover:bg-[#991b1b]"
-      >
-        ⚠️ Report an Issue
-      </a>
     </aside>
   );
 };

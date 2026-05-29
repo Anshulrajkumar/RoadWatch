@@ -46,38 +46,38 @@ const ReportIssue = () => {
 
   return (
     <div className="space-y-6">
-      <div className="rounded-xl border border-border bg-navy text-white shadow-card">
-        <div className="border-l-4 border-accent px-6 py-6">
-          <p className="small-caps text-white/70">Citizen Action Desk</p>
-          <h2 className="mt-2 font-serif text-2xl">Report Road Issue</h2>
-          <p className="mt-2 text-sm text-white/70">
-            Submit verified infrastructure complaints with AI severity scoring and automatic routing.
-          </p>
-        </div>
-      </div>
-
       <div className="grid gap-6 xl:grid-cols-[320px_minmax(0,1fr)_320px]">
-        <ReportIssueForm
-          onPreviewChange={setPreview}
-          onLocationChange={setCoords}
-          onRoadInfoChange={setRoadInfo}
-          onAiInsight={setAiInsight}
-          onComplaint={setComplaint}
-          onStatusChange={setStatus}
-        />
-
-        <UploadPreview preview={preview} coords={coords} road={roadInfo} />
-
-        <div className="space-y-6">
-          <RoadInfoCard road={roadInfo} coords={coords} />
-          <SeverityCard insight={aiInsight} loading={status.submitting} />
-          <ComplaintSummary complaint={complaint} />
-          <ComplaintHistory
-            complaints={history}
-            loading={historyStatus.loading}
-            error={historyStatus.error}
-            onRefresh={fetchHistory}
+        <div className="flex flex-col gap-3">
+          <p className="text-base font-semibold uppercase tracking-[0.18em] text-center text-ink/60">
+            Complain Details
+          </p>
+          <ReportIssueForm
+            onPreviewChange={setPreview}
+            onLocationChange={setCoords}
+            onRoadInfoChange={setRoadInfo}
+            onAiInsight={setAiInsight}
+            onComplaint={setComplaint}
+            onStatusChange={setStatus}
           />
+        </div>
+
+        <UploadPreview preview={preview} coords={coords} road={roadInfo} submitting={status.submitting} />
+
+        <div className="flex flex-col gap-3">
+          <p className="text-base font-semibold uppercase tracking-[0.18em] text-center text-ink/60">
+            Complain Analysis
+          </p>
+          <div className="flex flex-col gap-6">
+            <RoadInfoCard road={roadInfo} coords={coords} />
+            <SeverityCard insight={aiInsight} loading={status.submitting} />
+            <ComplaintSummary complaint={complaint} />
+            <ComplaintHistory
+              complaints={history}
+              loading={historyStatus.loading}
+              error={historyStatus.error}
+              onRefresh={fetchHistory}
+            />
+          </div>
         </div>
       </div>
     </div>
