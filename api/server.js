@@ -1,8 +1,5 @@
 "use strict";
 
-const path = require("path");
-require("dotenv").config({ path: path.join(__dirname, "..", "backend", ".env") });
-
 const express = require("express");
 const cors = require("cors");
 
@@ -51,8 +48,12 @@ app.use((req, res) => {
 });
 
 app.use((err, req, res, _next) => {
-  console.error("Server error:", err.message);
-  res.status(500).json({ error: "Internal server error" });
+  console.error("Server error:", err.message, err.stack);
+  const status = err.statusCode || err.status || 500;
+  res.status(status).json({
+    error: err.message || "Internal server error",
+    success: false,
+  });
 });
 
 module.exports = app;
