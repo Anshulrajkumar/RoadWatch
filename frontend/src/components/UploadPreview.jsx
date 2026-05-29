@@ -2,7 +2,7 @@ import { MapContainer, Marker, TileLayer, ZoomControl } from "react-leaflet";
 import { useMemo } from "react";
 import L from "leaflet";
 
-const UploadPreview = ({ preview, coords, road }) => {
+const UploadPreview = ({ preview, coords, road, submitting }) => {
   const fallbackCenter = { lat: 22.9734, lng: 78.6569 };
   const center = coords || fallbackCenter;
 
@@ -31,7 +31,7 @@ const UploadPreview = ({ preview, coords, road }) => {
           </div>
         </div>
 
-        <div className="relative flex h-[360px] items-center justify-center bg-muted">
+        <div className="relative flex h-[280px] items-center justify-center bg-muted md:h-[320px] xl:h-[360px]">
           {preview?.url ? (
             preview.type === "video" ? (
               <video
@@ -56,6 +56,15 @@ const UploadPreview = ({ preview, coords, road }) => {
         </div>
       </section>
 
+      <button
+        type="submit"
+        form="report-issue-form"
+        className="w-full rounded-md bg-accent px-4 py-4 text-sm font-semibold uppercase tracking-[0.12em] text-white shadow-soft transition hover:bg-accent-soft"
+        disabled={submitting}
+      >
+        {submitting ? "Submitting Complaint..." : "Submit Complaint"}
+      </button>
+
       <section className="relative overflow-hidden rounded-xl border border-border bg-white shadow-card">
         <div className="border-b border-border bg-white px-6 py-3">
           <div className="flex flex-wrap items-center gap-3 text-xs uppercase tracking-[0.14em] text-ink/60">
@@ -66,7 +75,7 @@ const UploadPreview = ({ preview, coords, road }) => {
           </div>
         </div>
 
-        <div className="rw-map-tint h-[360px] w-full">
+        <div className="rw-map-tint h-[360px] w-full md:h-[420px] xl:h-[520px]">
           <MapContainer center={[center.lat, center.lng]} zoom={coords ? 13 : 5} zoomControl={false}>
             <TileLayer
               attribution='&copy; OpenStreetMap contributors'
