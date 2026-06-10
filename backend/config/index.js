@@ -8,7 +8,7 @@ const toInt = (value, fallback) => {
 const config = {
   port: toInt(process.env.PORT, 4000),
   corsOrigin: "*",
-  requestTimeoutMs: 20000,
+  requestTimeoutMs: 120000,
   geocode: {
     url: "https://nominatim.openstreetmap.org/reverse",
     userAgent: "RoadWatch/1.0",

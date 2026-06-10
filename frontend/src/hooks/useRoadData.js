@@ -22,7 +22,7 @@ export const useRoadData = () => {
 
     const hydrateInitialCoords = async () => {
       try {
-        const position = await getCurrentLocation({ timeout: 8000, maximumAge: 120000 });
+        const position = await getCurrentLocation({ timeout: 8000 });
         if (!cancelled) {
           setUserCoords({ lat: position.latitude, lng: position.longitude });
         }
@@ -59,7 +59,8 @@ export const useRoadData = () => {
     try {
       setLoading(true);
       setError(null);
-      const position = await getCurrentLocation();
+      // Pass maximumAge: 0 to force a fresh GPS coordinate
+      const position = await getCurrentLocation({ maximumAge: 0 });
       setUserCoords({ lat: position.latitude, lng: position.longitude });
       await fetchByCoords(position.latitude, position.longitude, true);
     } catch (err) {
@@ -76,7 +77,7 @@ export const useRoadData = () => {
       let searchCoords = userCoords || coords;
       if (!searchCoords) {
         try {
-          const position = await getCurrentLocation({ timeout: 5000, maximumAge: 30000 });
+          const position = await getCurrentLocation({ timeout: 5000 });
           searchCoords = { lat: position.latitude, lng: position.longitude };
           setUserCoords(searchCoords);
         } catch (geoError) {

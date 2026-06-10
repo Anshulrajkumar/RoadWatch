@@ -62,6 +62,7 @@ const reportIssue = async (req, res, next) => {
     const userId = req.user?.id || getBodyValue(req.body, "userId", "user_id", "citizenId", "citizen_id");
     const lat = Number.parseFloat(getBodyValue(req.body, "latitude", "lat"));
     const lng = Number.parseFloat(getBodyValue(req.body, "longitude", "lng"));
+    console.log(`[STAGE 4: BACKEND RECEIVED] POST /api/issues/report lat=${lat}, lng=${lng}`);
 
     if (!issueType) {
       return res.status(400).json({
@@ -91,6 +92,7 @@ const reportIssue = async (req, res, next) => {
 
     if (needsRoadEnrichment(road)) {
       const geocodeResult = await reverseGeocode(lat, lng);
+      console.log(`[STAGE 6: REVERSE GEOCODER] input lat=${lat}, lng=${lng} -> geocodeResult=`, JSON.stringify(geocodeResult.data?.address || {}));
       road = extractRoad(geocodeResult.data || {});
     }
 

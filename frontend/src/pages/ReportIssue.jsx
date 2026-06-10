@@ -5,7 +5,7 @@ import RoadInfoCard from "../components/RoadInfoCard.jsx";
 import SeverityCard from "../components/SeverityCard.jsx";
 import ComplaintSummary from "../components/ComplaintSummary.jsx";
 
-const ReportIssue = () => {
+const ReportIssue = ({ onNavigate }) => {
   const [preview, setPreview] = useState(null);
   const [coords, setCoords] = useState(null);
   const [roadInfo, setRoadInfo] = useState(null);
@@ -27,6 +27,7 @@ const ReportIssue = () => {
             onAiInsight={setAiInsight}
             onComplaint={setComplaint}
             onStatusChange={setStatus}
+            onNavigate={onNavigate}
           />
         </div>
 

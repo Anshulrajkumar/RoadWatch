@@ -95,6 +95,8 @@ const createComplaint = async (payload) => {
     estimated_completion: payload.estimatedCompletion || addDays(new Date(), 14).toISOString(),
   };
 
+  console.log(`[STAGE 5: DATABASE INSERT] payload lat=${complaint.latitude}, lng=${complaint.longitude}`);
+
   const { data, error } = await supabase
     .from("complaints")
     .insert([complaint])
