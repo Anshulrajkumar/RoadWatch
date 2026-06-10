@@ -54,10 +54,12 @@ export const AuthProvider = ({ children }) => {
   };
 
   const signInWithGoogle = async () => {
+    // Explicitly construct the redirect URL to ensure it redirects back to localhost during dev
+    const redirectUrl = window.location.origin + "/";
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: window.location.origin,
+        redirectTo: redirectUrl,
       },
     });
     if (error) throw error;

@@ -3,7 +3,7 @@ import { supabase } from "../lib/supabase.js";
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || "",
-  timeout: 12000,
+  timeout: 30000,
   headers: {
     Accept: "application/json",
   },
@@ -42,6 +42,7 @@ export const reportIssue = async (formData, onUploadProgress) => {
     headers: {
       "Content-Type": "multipart/form-data",
     },
+    timeout: 120000,
     onUploadProgress,
   });
   return response.data;

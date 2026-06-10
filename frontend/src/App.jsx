@@ -131,15 +131,15 @@ const App = () => {
     );
   }
 
-  // --- Report Issue page ---
+  // --- Report Issue page (protected — user must be logged in to submit) ---
   if (location.pathname === "/report") {
     return (
-      <>
+      <ProtectedRoute onNavigate={navigate}>
         <DashboardLayout activePage={activePage} onNavigate={navigate} onBrandClick={() => navigate("/")}>
-          <ReportIssue />
+          <ReportIssue onNavigate={navigate} />
         </DashboardLayout>
         <ChatbotWidget currentPage={location.pathname} />
-      </>
+      </ProtectedRoute>
     );
   }
 

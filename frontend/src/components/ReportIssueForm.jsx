@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import IssueUploadCard from "./IssueUploadCard.jsx";
 import LocationFetcher from "./LocationFetcher.jsx";
+import ComplaintSuccessModal from "./ComplaintSuccessModal.jsx";
 import { getNearestRoad, reportIssue, rewriteIssueDescription } from "../services/api";
 import { useGeolocation } from "../hooks/useGeolocation";
 import { compressImage } from "../utils/compressImage";
@@ -37,6 +38,7 @@ const ReportIssueForm = ({
   onAiInsight,
   onComplaint,
   onStatusChange,
+  onNavigate,
 }) => {
   const { user } = useAuth();
   const draft = readDraft();
@@ -49,6 +51,7 @@ const ReportIssueForm = ({
   const [locationError, setLocationError] = useState(null);
   const [locationLoading, setLocationLoading] = useState(false);
   const [status, setStatus] = useState({ submitting: false, progress: 0, error: null });
+  const [successModalOpen, setSuccessModalOpen] = useState(false);
   const [rewriteStatus, setRewriteStatus] = useState({ loading: false, error: null });
   const [draftTimestamp, setDraftTimestamp] = useState(draft?.updatedAt || null);
 
@@ -179,7 +182,7 @@ const ReportIssueForm = ({
     setLocationError(null);
 
     try {
-      const position = await getCurrentLocation();
+      const position = await getCurrentLocation({ maximumAge: 0 });
       const lat = position.latitude;
       const lng = position.longitude;
       setCoords({ lat, lng });
@@ -278,6 +281,11 @@ const ReportIssueForm = ({
       reset(emptyValues);
       localStorage.removeItem(DRAFT_KEY);
       setDraftTimestamp(null);
+      setImageFile(null);
+      setVideoFile(null);
+      if (preview?.url) URL.revokeObjectURL(preview.url);
+      setPreview(null);
+      setSuccessModalOpen(true);
     } catch (error) {
       setStatus({ submitting: false, progress: 0, error: error?.message || "Submission failed." });
     }
@@ -394,6 +402,20 @@ const ReportIssueForm = ({
           {status.error}
         </div>
       ) : null}
+
+      <ComplaintSuccessModal
+        open={successModalOpen}
+        onClose={() => setSuccessModalOpen(false)}
+        onGoToDashboard={() => {
+          setSuccessModalOpen(false);
+          if (onNavigate) {
+            onNavigate("/complaints");
+          } else {
+            window.history.pushState({}, "", "/complaints");
+            window.dispatchEvent(new PopStateEvent("popstate"));
+          }
+        }}
+      />
     </form>
   );
 };
