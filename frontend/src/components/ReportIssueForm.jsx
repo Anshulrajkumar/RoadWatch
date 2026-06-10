@@ -183,8 +183,6 @@ const ReportIssueForm = ({
 
     try {
       const position = await getCurrentLocation({ maximumAge: 0 });
-      const logMsg = `STAGE_2_FRONTEND_STATE_lat_${position.latitude}_lng_${position.longitude}`;
-      fetch(`http://localhost:4000/api/health?log=${logMsg}`).catch(()=>({}));
       const lat = position.latitude;
       const lng = position.longitude;
       setCoords({ lat, lng });
@@ -244,7 +242,6 @@ const ReportIssueForm = ({
       formData.append("description", values.description || "");
       formData.append("latitude", values.latitude);
       formData.append("longitude", values.longitude);
-      console.log(`[STAGE 3: FORM PAYLOAD] latitude: ${values.latitude}, longitude: ${values.longitude}`);
 
       // Attach authenticated user ID
       if (user?.id) {
